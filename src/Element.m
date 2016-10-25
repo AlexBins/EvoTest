@@ -2,13 +2,17 @@ classdef Element < handle
     %ELEMENT Interface for an element in the current scenario
     %   
     properties
-        X
-        Y
+        Location
         OrientationAngle
     end
     
     methods
+        function Draw(self)
+        end
+        
+        function SetLocation(self, x, y)
+            self.Location = [x;y;1];
+        end
     end
-    
 end
 

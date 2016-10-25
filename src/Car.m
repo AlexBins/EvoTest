@@ -3,11 +3,18 @@ classdef Car < RectangularElement
     %   Detailed explanation goes here
     
     properties
-        VX
-        VY
+        Velocity
     end
     
     methods
+        function obj = Car(x, y, angle)
+            obj = obj@RectangularElement(x, y, 1.125, 0.75, angle);
+            obj.Velocity = [ 0; 0; 0 ];
+        end
+        
+        function Draw(self)
+            self.Draw@RectangularElement();
+        end
     end
     
 end
