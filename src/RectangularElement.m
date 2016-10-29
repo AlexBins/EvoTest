@@ -5,6 +5,7 @@ classdef RectangularElement < Element
     properties
         Width
         Height
+        plot_handle
     end
     
     methods
@@ -15,7 +16,12 @@ classdef RectangularElement < Element
             obj.Height = height;
         end
         
-        function Draw(self)
+        function Draw(self, varargin)
+            if (length(varargin) < 1)
+                color = 'b';
+            else
+                color = varargin{1};
+            end
             x = self.Location(1);
             y = self.Location(2);
             rect = CreateRectangle(x - self.Width / 2, y - self.Height / 2, self.Width, self.Height);
@@ -23,7 +29,7 @@ classdef RectangularElement < Element
             tlout = CreateTranslation(x, y);
             rot = CreateRotation(self.OrientationAngle);
             rect = tlout * rot * tlin * rect;
-            plot(rect(1,:), rect(2,:))
+            self.plot_handle = fill(rect(1,:), rect(2,:), color);
         end
     end
     

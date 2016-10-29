@@ -52,8 +52,11 @@ classdef World < handle
             %   side: The side of the street to add the element to (0 left,
             %   1 right)
             %   distance: The distance from the street
-            location = self.Street.GetLocation(streetProgress, side, distance);
+            [location, direction] = self.Street.GetLocation(streetProgress, side, distance);
             element.SetLocation(location(1), location(2));
+            
+            angle = atan(direction(2) / direction(1));
+            element.SetOrientationAngle(angle);
         end
     end
     

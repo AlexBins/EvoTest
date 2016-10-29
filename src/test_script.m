@@ -1,9 +1,8 @@
-world = World(0, 0, 0);
-rc = RectangularElement(0, 0, 1.125, 0.75, 0);
-cc = CircularElement(0, 0, 1);
-world.AddElement(rc);
-%world.AddElement(cc);
-world.Street = Street([-3, 0.5; 3, 0.5],[0,0],[0,0]);
-world.PlaceElement(rc, 0.5, 1, 0.75 / 2 + 0.1);
+sc = Scenario.CreateWithSlot(0.5, 1.5, 1, 1, -1.5);
+sc.Trajectory.Add(1, 0, 0, 1);
+sc.Trajectory.Add(1, 0, pi * 2, 4);
+sc.Trajectory.Add(2, 0, pi * 2.25, 1);
+sc.Trajectory.Add(3, 0, pi * 2, 1);
+sc.Trajectory.Add(4, 0, pi * 2, 1);
 
-world.Display();
+sc.Replay(0.03, 2);

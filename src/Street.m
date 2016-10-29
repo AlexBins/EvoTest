@@ -15,7 +15,7 @@ classdef Street < handle
     
     methods
         
-        function location = GetLocation(self, streetProgress, side, distance)
+        function [location, direction] = GetLocation(self, streetProgress, side, distance)
             start = [ 0 0 ];
             dir = [ 0 0 ];
             perc = streetProgress;
@@ -25,7 +25,7 @@ classdef Street < handle
                 dir = self.Points(:,i) - self.Points(:,i-1);
                 len = sqrt(dot(dir, dir));
                 p = len / self.Length;
-                if p > perc
+                if p >= perc
                     normal = self.private_normals(:,i-1);
                     break
                 else
@@ -34,9 +34,11 @@ classdef Street < handle
             end
             loc = start + dir / norm(dir) * perc * self.Length;
             mod = 1;
-            if side == 0
+            if side ~= 1
                 mod = -1;
             end
+            
+            direction = dir;
             
             offset = normal * (distance + 1);
             location = [loc; 1] + mod * offset;
