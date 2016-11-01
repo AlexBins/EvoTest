@@ -26,7 +26,7 @@ classdef Scenario
                 obj.World.AddElement(cc);
             end
             
-            obj.CarStartInformation = [obj.Car.GetX(), obj.Car.GetY(), obj.Car.OrientationAngle];
+            obj.CarStartInformation = [obj.Car.GetX(), obj.Car.GetY(), obj.Car.GetOrientationRadians()];
         end
         
         function DisplayScenario(self, time)
@@ -71,6 +71,7 @@ classdef Scenario
             cl = [result.Car.GetX(); result.Car.GetY()];
             cl = cl + slotDir * carOffset;
             result.Car.SetLocation(cl(1), cl(2));
+            result.CarStartInformation = [result.Car.GetX(), result.Car.GetY(), result.Car.GetOrientationRadians()];
             
             obs1 = RectangularElement(slotLoc(1) - slotDir(1) * (slotWidth + carWidth) / 2, slotLoc(2) - slotDir(2) * (slotWidth + carWidth) / 2, carWidth, carHeight, 0);
             result.World.AddElement(obs1);

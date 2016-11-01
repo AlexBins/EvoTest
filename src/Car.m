@@ -17,8 +17,8 @@ classdef Car < RectangularElement
         
         function Draw(self)
             self.Draw@RectangularElement('r');
-            dx = cos(self.OrientationAngle);
-            dy = sin(self.OrientationAngle);
+            dx = cos(self.GetOrientationRadians());
+            dy = sin(self.GetOrientationRadians());
             x = self.GetX();
             y = self.GetY();
             self.arrowHandle = quiver(x, y, dx, dy, 'k');
