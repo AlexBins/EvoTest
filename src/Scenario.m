@@ -33,9 +33,14 @@ classdef Scenario
             % Execute each column in the control matrix for dt seconds
             % control_matrix(1) contains 2 entries: velocity and
             % steering_angle
+            
+            % iterate over the control matrix
             for idx=1:length(control_matrix);
+                % receive the currenct control vector
                 ctr_vector = control_matrix(:,idx);
+                % move the car according to the provided information
                 self.Car.Move(ctr_vector(1), ctr_vector(2), dt);
+                % Log the new positions
                 self.Trajectory.LogCar(self.Car, dt);
             end
         end

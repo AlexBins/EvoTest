@@ -23,6 +23,8 @@ classdef Trajectory < handle
         end
         
         function LogCar(self, car, deltaTime)
+            % apply the coordinates of the car to the trajectory
+            % in order to trace the car
             self.Add(car.GetX(), car.GetY(),  car.GetOrientationRadians(), deltaTime);
         end
         
