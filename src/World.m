@@ -40,7 +40,8 @@ classdef World < handle
             
             self.Car.Draw();
             
-            axis([-3 3 -3 3]);
+            axis equal
+            % axis([-3 3 -3 3]);
         end
         
         function PlaceElement(self, element, streetProgress, side, distance)

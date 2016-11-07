@@ -3,16 +3,16 @@ classdef Car < RectangularElement
     %   Detailed explanation goes here
     
     properties
-        Velocity
         arrowHandle
         canredraw
+        dt
     end
     
     methods
         function obj = Car(x, y, angle)
             obj = obj@RectangularElement(x, y, 1.125, 0.75, angle);
             obj.canredraw = false;
-            obj.Velocity = [ 0; 0; 0 ];
+            obj.dt = 0.1;
         end
         
         function Draw(self)
@@ -31,6 +31,17 @@ classdef Car < RectangularElement
                 delete(self.arrowHandle);
             end
             self.Draw();
+        end
+        
+        
+        function Move(self, velocity, steering_angle, dt)
+            state = [self.GetX(); self.GetY(); self.GetOrientationRadians()];
+                    
+            control = [cos(state(3))*dt; sin(state(3))*dt; dt*tan(steering_angle)/self.Width(1)];
+            new_state = state  + control * velocity;
+            
+            self.SetLocation(new_state(1), new_state(2));
+            self.SetOrientationAngle(new_state(3));
         end
     end
     
