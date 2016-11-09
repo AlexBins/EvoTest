@@ -21,14 +21,13 @@ classdef PlanCircle
             plan.Direction = direction;
         end
         
-        function ctrl_signal = CalculateControlSignal(self, velocity)
-            % Fixme: this is default, change to 
+        function ctrl_signal = CalculateControlSignal(self, velocity, axisDistance)
             if self.Direction
                 dAngle = self.RadiansEnd - self.RadiansStart;
             else
                 dAngle = self.RadiansStart - self.RadiansEnd;
             end
-            steering_angle = 0;
+            steering_angle = atan(axisDistance/self.Radius);
             distance = dAngle*self.Radius;
             duration = distance / velocity;
             ctrl_signal = [velocity steering_angle duration];
