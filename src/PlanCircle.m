@@ -6,19 +6,32 @@ classdef PlanCircle
         PosX;
         PosY;
         Radius;
-        Arc_start;
-        Arc_end;
+        RadiansStart;
+        RadiansEnd;
         Direction;
     end
     
     methods
-        function plan = PlanCircle(posX, posY, radius, arc_start, arc_end, direction)
+        function plan = PlanCircle(posX, posY, radius, radiansStart, radiansEnd, direction)
             plan.PosX = posX;
             plan.PosY = posY;
             plan.Radius = radius;
-            plan.Arc_start = arc_start;
-            plan.Arc_end = arc_end;
+            plan.RadiansStart = radiansStart;
+            plan.RadiansEnd = radiansEnd;
             plan.Direction = direction;
+        end
+        
+        function ctrl_signal = CalculateControlSignal(self, velocity)
+            % Fixme: this is default, change to 
+            if self.Direction
+                dAngle = self.RadiansEnd - self.RadiansStart;
+            else
+                dAngle = self.RadiansStart - self.RadiansEnd;
+            end
+            steering_angle = 0;
+            distance = dAngle*self.Radius;
+            duration = distance / velocity;
+            ctrl_signal = [velocity steering_angle duration];
         end
     end
     
