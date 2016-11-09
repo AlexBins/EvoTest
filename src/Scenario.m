@@ -29,6 +29,14 @@ classdef Scenario
             obj.CarStartInformation = [obj.Car.GetX(), obj.Car.GetY(), obj.Car.GetOrientationRadians()];
         end
         
+        function drive_circle(self, velocity, steering_angle, duration, dt)
+            car = self.Car;
+            for i = 1:duration/dt
+                car.Move(velocity, steering_angle, dt);
+                self.Trajectory.Add(car.GetX(), car.GetY(), car.GetOrientationRadians(), dt);
+            end
+        end
+        
         function DisplayScenario(self, time)
             if (time <= 0)
                 self.Car.SetLocation(self.CarStartInformation(1), self.CarStartInformation(2));
