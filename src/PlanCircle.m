@@ -12,9 +12,12 @@ classdef PlanCircle
     end
     
     methods
-        function plan = PlanCircle(posX, posY, radius, radiansStart, radiansEnd, direction)
-            plan.PosX = posX;
-            plan.PosY = posY;
+        function plan = PlanCircle(radius, radiansStart, radiansEnd, direction)
+            % radius: the radius of the circle
+            % radiansStart: the start angle in radians, where the car
+            % starts driving
+            % radiansEnd: the end angle in radians, where the car stops
+            % driving
             plan.Radius = radius;
             plan.RadiansStart = radiansStart;
             plan.RadiansEnd = radiansEnd;
@@ -22,6 +25,9 @@ classdef PlanCircle
         end
         
         function ctrl_signal = CalculateControlSignal(self, velocity, axisDistance)
+            % Based on the shape, calculate the (velocity,
+            % steering_angle, duration) tuple from the velocity and the
+            % distance between the axis
             if self.Direction
                 dAngle = self.RadiansEnd - self.RadiansStart;
             else
