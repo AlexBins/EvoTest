@@ -37,7 +37,7 @@ classdef Car < RectangularElement
         function Move(self, velocity, steering_angle, dt)
             state = [self.GetX(); self.GetY(); self.GetOrientationRadians()];
                     
-            control = [cos(state(3))*dt; sin(state(3))*dt; dt*tan(steering_angle)/self.Width(1)];
+            control = [cos(state(3))*dt; sin(state(3))*dt; dt*tan(steering_angle)/self.Width];
             new_state = state  + control * velocity;
             
             self.SetLocation(new_state(1), new_state(2));
