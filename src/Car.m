@@ -35,11 +35,18 @@ classdef Car < RectangularElement
         
         
         function Move(self, velocity, steering_angle, dt)
+            % get the current state that has to be modified
+            % in order to apply a simple matrix multiplication
             state = [self.GetX(); self.GetY(); self.GetOrientationRadians()];
                     
+            % generate control matrix:
+            % position is moved by velocity in a certain direction (x,y)
+            % orientation is changed according to the steering_angle and
+            % the axis offset and the velocity
             control = [cos(state(3))*dt; sin(state(3))*dt; dt*tan(steering_angle)/self.Width];
             new_state = state  + control * velocity;
             
+            % apply the new state vector to the car
             self.SetLocation(new_state(1), new_state(2));
             self.SetOrientationAngle(new_state(3));
         end
