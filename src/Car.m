@@ -5,13 +5,19 @@ classdef Car < RectangularElement
     properties
         arrowHandle
         canredraw
+        maxSteeringAngle
         dt
     end
     
     methods
-        function obj = Car(x, y, angle)
+        function obj = Car(x, y, angle, varargin)
             obj = obj@RectangularElement(x, y, 1.125, 0.75, angle);
             obj.canredraw = false;
+            if ~isempty(varargin)
+                obj.maxSteeringAngle = varargin{1};
+            else
+                obj.maxSteeringAngle = pi/2;
+            end
             obj.dt = 0.1;
         end
         
@@ -35,6 +41,9 @@ classdef Car < RectangularElement
         
         
         function Move(self, velocity, steering_angle, dt)
+            if abs(steering_angle) < self.maxSteeringAngle
+                throw(MException('Car:moveAngleToBig','Please provide another steering angle'));
+            end
             % get the current state that has to be modified
             % in order to apply a simple matrix multiplication
             state = [self.GetX(); self.GetY(); self.GetOrientationRadians()];
