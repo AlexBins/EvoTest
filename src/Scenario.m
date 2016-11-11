@@ -29,19 +29,40 @@ classdef Scenario
             obj.CarStartInformation = [obj.Car.GetX(), obj.Car.GetY(), obj.Car.GetOrientationRadians()];
         end
         
-        function ExecuteControlMatrix(self, control_matrix, dt)
-            % Execute each column in the control matrix for dt seconds
-            % control_matrix(1) contains 2 entries: velocity and
-            % steering_angle
+        function ExecuteControlMatrix(self, control_matrix)
+            % Execute the control matrix
+            % Execute one by one the control vectors using an interval for
+            % the trajectory generation, that doesn't lead to
+            % discretization errors by fullfilling the equation n * dt =
+            % vector.duration with n in Natural Numbers and the inequation
+            % dt < 0.1 / vector.velocity and dt being maximal
             
             % iterate over the control matrix
-            for idx=1:length(control_matrix);
+            for idx=1:size(control_matrix, 2)
                 % receive the currenct control vector
                 ctr_vector = control_matrix(:,idx);
-                % move the car according to the provided information
-                self.Car.Move(ctr_vector(1), ctr_vector(2), dt);
-                % Log the new positions
-                self.Trajectory.LogCar(self.Car, dt);
+                % Extract the single values out of the vector
+                velocity = ctr_vector(1);
+                steering_angle = ctr_vector(2);
+                duration = ctr_vector(3);
+                % Calculate the maximum possible dt
+                max_dt = 0.1 / velocity;
+                % Get the amount the maximum possible dt would be needed to
+                % run the current control vector
+                n = duration / max_dt;
+                % Since an amount should be a natural number and dt must be
+                % smaller or equal to the maximum dt, round up to the next
+                % natural number
+                n = ceil(n);
+                % Calculate the actual dt
+                dt = duration / n;
+                % Now move the car the calculated amount of times
+                for i = 1:n
+                    % move the car according to the provided information
+                    self.Car.Move(velocity, steering_angle, dt);
+                    % Log the new positions
+                    self.Trajectory.LogCar(self.Car, dt);
+                end
             end
         end
         
