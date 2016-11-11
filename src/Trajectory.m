@@ -9,17 +9,21 @@ classdef Trajectory < handle
     end
     
     methods
-        function obj = Trajectory(startx, starty, startangle)
-            obj.Locations = [startx starty;];
-            obj.Angles = [startangle];
-            obj.Timestamps = [0];
+        function obj = Trajectory()
+            obj.Locations = [];
+            obj.Angles = [];
+            obj.Timestamps = [];
         end
         
         function Add(self, x, y, angle, deltaTime)
             index = length(self.Timestamps) + 1;
             self.Locations(index, :) = [x y];
             self.Angles(index) = angle;
-            self.Timestamps(index) = self.Timestamps(index - 1) + deltaTime;
+            if isempty(self.Timestamps)
+               self.Timestamps(index) = deltaTime; 
+            else
+                self.Timestamps(index) = self.Timestamps(index - 1) + deltaTime;
+            end
         end
         
         function LogCar(self, car, deltaTime)
