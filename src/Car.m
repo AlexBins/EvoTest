@@ -41,7 +41,7 @@ classdef Car < RectangularElement
         
         
         function Move(self, velocity, steering_angle, dt)
-            if abs(steering_angle) < self.maxSteeringAngle
+            if abs(steering_angle) > self.maxSteeringAngle
                 throw(MException('Car:moveAngleToBig','Please provide another steering angle'));
             end
             % get the current state that has to be modified

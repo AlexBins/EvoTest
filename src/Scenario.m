@@ -29,12 +29,28 @@ classdef Scenario
             obj.CarStartInformation = [obj.Car.GetX(), obj.Car.GetY(), obj.Car.GetOrientationRadians()];
         end
         
-        function drive_circle(self, velocity, steering_angle, duration, dt)
-            car = self.Car;
-            for i = 1:duration/dt
-                car.Move(velocity, steering_angle, dt);
-                self.Trajectory.Add(car.GetX(), car.GetY(), car.GetOrientationRadians(), dt);
+        function ExecuteControlMatrix(self, control_matrix, dt)
+            % Execute each column in the control matrix for dt seconds
+            % control_matrix(1) contains 2 entries: velocity and
+            % steering_angle
+            
+            % iterate over the control matrix
+            for idx=1:length(control_matrix);
+                % receive the currenct control vector
+                ctr_vector = control_matrix(:,idx);
+                % move the car according to the provided information
+                self.Car.Move(ctr_vector(1), ctr_vector(2), dt);
+                % Log the new positions
+                self.Trajectory.LogCar(self.Car, dt);
             end
+        end
+        
+        function DriveCircle(self, velocity, steering_angle, duration, dt)
+            ctrl = zeros(2, duration/dt);
+            for idx = 1:duration/dt
+                ctrl(:,idx) = [velocity; steering_angle];
+            end
+            self.ExecuteControlMatrix(ctrl, dt);
         end
         
         function DisplayScenario(self, time)

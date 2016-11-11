@@ -22,6 +22,12 @@ classdef Trajectory < handle
             self.Timestamps(index) = self.Timestamps(index - 1) + deltaTime;
         end
         
+        function LogCar(self, car, deltaTime)
+            % apply the coordinates of the car to the trajectory
+            % in order to trace the car
+            self.Add(car.GetX(), car.GetY(),  car.GetOrientationRadians(), deltaTime);
+        end
+        
         function duration = GetDuration(self)
             duration = self.Timestamps(length(self.Timestamps));
         end
