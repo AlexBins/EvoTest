@@ -11,7 +11,7 @@ classdef Scenario
     
     methods
         function obj = Scenario(carprogress, carSide, rectangledescriptions, circlelocations)
-            obj.Trajectory = Trajectory(0, 0, 0);
+            obj.Trajectory = Trajectory();
             obj.World = World(0, 0, 0);
             obj.World.Street = Street([-3 0; 3 0], [0 0], [0 0]);
             obj.Car = obj.World.Car;
@@ -38,9 +38,9 @@ classdef Scenario
             % dt < 0.1 / vector.velocity and dt being maximal
             
             % iterate over the control matrix
-            for idx=1:size(control_matrix, 2)
+            for idx=1:size(control_matrix, 1)
                 % receive the currenct control vector
-                ctr_vector = control_matrix(:,idx);
+                ctr_vector = control_matrix(idx, :);
                 % Extract the single values out of the vector
                 velocity = ctr_vector(1);
                 steering_angle = ctr_vector(2);
@@ -84,9 +84,9 @@ classdef Scenario
                 self.DisplayScenario(time);
             else
                 [x, y, a] = self.Trajectory.GetAtTime(time);
-                x = self.CarStartInformation(1) + x;
-                y = self.CarStartInformation(2) + y;
-                a = self.CarStartInformation(3) + a;
+                %x = self.CarStartInformation(1) + x;
+                %y = self.CarStartInformation(2) + y;
+                %a = self.CarStartInformation(3) + a;
                 self.Car.SetLocation(x, y);
                 self.Car.SetOrientationAngle(a);
                 self.Car.Redraw();
@@ -94,10 +94,8 @@ classdef Scenario
         end
         
         function Replay(self, deltaT, speedupfactor)
-            accumulatedT = 0;
             for t = 0:deltaT:self.Trajectory.GetDuration()
-                self.DisplayScenario(accumulatedT);
-                accumulatedT = accumulatedT + deltaT;
+                self.DisplayScenario(t);
                 pause(deltaT / speedupfactor);
             end
         end
