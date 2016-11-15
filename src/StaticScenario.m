@@ -12,7 +12,7 @@ classdef StaticScenario < Scenario
             
             carWidth = 1.125;
             carHeight = 0.75;
-            slotWidth = 1.5 * carWidth;
+            slotWidth = 2 * carWidth;
             slotDepth = 1;
             
             street = Street([-3 0; 3 0], [0 0], [0 0]);
@@ -35,6 +35,29 @@ classdef StaticScenario < Scenario
             obj.World.PlaceElement(obs3, 0.5, 1, slotDepth + 3);
             
             obj.parkingSlot = RectangularElement(slotLoc(1), slotLoc(2), slotWidth, slotDepth, 0);
+        end
+        
+        function test(self)
+            debug = true;
+            msa = self.Car.maxSteeringAngle;
+            minr = self.Car.Width / tan(msa);
+            [tl, to] = ParkingPilot.getTarget(...
+                self.parkingSlot.GetX(), self.parkingSlot.GetY(),...
+                self.parkingSlot.GetOrientationRadians(), ...
+                self.parkingSlot.Width, self.parkingSlot.Height,...
+                self.Car.GetX(), self.Car.GetY(),...
+                self.Car.Width, self.Car.Height);
+            [ip, gs, dl, do] = ParkingPilot.tryDirectParking(...
+                self.Car.GetX(), self.Car.GetY(),...
+                self.Car.GetOrientationRadians(), ...
+                tl(1), tl(2), to, 1, minr);
+            if debug
+                drawGS(gs);
+            end
+            if ip
+                cm = gs.getControlMatrix(1, self.Car.Width);
+                self.ExecuteControlMatrix(cm);
+            end
         end
         
         function DisplayScenario(self, time)

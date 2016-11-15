@@ -42,11 +42,11 @@ classdef GeometricSequence < handle
             
             % initialize the control matrix with zeros to increase
             % performance
-            ctrlMatrix = zeros(3, length(self.Sequence));
+            ctrlMatrix = zeros(length(self.Sequence), 3);
             
             % fill the matrix
             for i = 1:length(self.Sequence)
-                ctrlMatrix(:,i) = self.getAt(i).CalculateControlSignal(velocity, axisDistance);
+                ctrlMatrix(i,:) = self.getAt(i).CalculateControlSignal(velocity, axisDistance);
             end
         end
         
