@@ -33,6 +33,10 @@ classdef RectangularElement < Element
             rect = tlout * rot * tlin * rect;
             self.plot_handle = fill(rect(1,:), rect(2,:), color);
         end
+        
+        function rect = GetRectangle(self)
+            rect = CreateRectangle(x - self.Width / 2, y - self.Height / 2, self.Width, self.Height);
+        end
     end
     
 end

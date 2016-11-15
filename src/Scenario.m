@@ -7,6 +7,8 @@ classdef Scenario
         Car
         Trajectory
         CarStartInformation
+        Collision
+        MinDistance
     end
     
     methods
@@ -27,6 +29,8 @@ classdef Scenario
             end
             
             obj.CarStartInformation = [obj.Car.GetX(), obj.Car.GetY(), obj.Car.GetOrientationRadians()];
+            obj.Collision = false;
+            MinDistance = NaN;
         end
         
         function ExecuteControlMatrix(self, control_matrix)
@@ -60,6 +64,22 @@ classdef Scenario
                 for i = 1:n
                     % move the car according to the provided information
                     self.Car.Move(velocity, steering_angle, dt);
+                    
+                    car_rect = self.Car.GetRectangle();
+                    for iElement = 1:length(self.World.RElements)
+                        i_rect = self.World.RElements(i).GetRectangle();
+                        
+                        [doCollide, distance] = fRectDist(car_rect, i_rect);
+                        
+                        if doCollide == 1
+                            self.Collision = true;
+                        end
+                        if isnan(self.MinDistance)
+                            self.MinDistance = distance;
+                        elseif ~isnan(distance) && distance < self.MinDistance
+                            self.MinDistance = distance;
+                        end
+                    end
                     % Log the new positions
                     self.Trajectory.LogCar(self.Car, dt);
                 end
