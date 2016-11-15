@@ -38,7 +38,8 @@ classdef StaticScenario < Scenario
         end
         
         function test(self)
-            debug = true;
+            debug = false;
+            
             msa = self.Car.maxSteeringAngle;
             minr = self.Car.Width / tan(msa);
             [tl, to] = ParkingPilot.getTarget(...
@@ -51,9 +52,11 @@ classdef StaticScenario < Scenario
                 self.Car.GetX(), self.Car.GetY(),...
                 self.Car.GetOrientationRadians(), ...
                 tl(1), tl(2), to, 1, minr);
+            
             if debug
                 drawGS(gs);
             end
+            
             if ip
                 cm = gs.getControlMatrix(1, self.Car.Width);
                 self.ExecuteControlMatrix(cm);

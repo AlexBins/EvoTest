@@ -7,7 +7,9 @@ classdef ParkingPilot < handle
     
     methods (Static)
         function [isDirectParkingPossibly, geometricSequence, dubinTarget, dubinOrientation] = tryDirectParking(carX, carY, carOrientation, targetX, targetY, targetOrientation, topofslot, minRadius)
-            debug = false;
+            debug = true;
+            %debug = false;
+            
             % initialize the results
             geometricSequence = GeometricSequence();
             dubinTarget = [0; 0];
@@ -117,6 +119,36 @@ classdef ParkingPilot < handle
             % the geometric sequence, else calculate the dubin's car target
             % location and direction
             if isDirectParkingPossibly
+                
+                ParkingPilot.fillWithElements(geometricSequence,...
+                    carl, carn, targetl, targetn,...
+                    circcar, circtarget, radcar, radtarget,...
+                    card, targetd, debug);
+            else % direct parking not possible => get dubin target position
+                dir = turn2DVec(targetd, 7 * pi / 6);
+                dir = dir / norm(dir);
+                circcar = circtarget + dir * 2 * minRadius;
+                radcar = minRadius;
+                
+                dubinOrientation = targetOrientation;
+                dubinTarget = circcar + targetn * radcar;
+                
+                ParkingPilot.fillWithElements(geometricSequence,...
+                    dubinTarget, targetn, targetl, targetn, circcar, circtarget,...
+                    radcar, radtarget, targetd, targetd, debug);
+                
+                if debug
+                    drawGS(geometricSequence);
+                    quiver(dubinTarget(1), dubinTarget(2), targetd(1) * 3, targetd(2) * 3, 'Color', 'r');
+                end
+            end
+        end
+        
+        function fillWithElements(geometricSequence, ...
+                carl, carn, targetl, targetn,...
+                circcar, circtarget, radcar, radtarget, card, targetd,...
+                debug)
+                
                 entryAngleCar = asin(-carn(2));
                 % this calculation is robust in comparions to atan
                 % considering division through zero but only returns and
@@ -199,11 +231,13 @@ classdef ParkingPilot < handle
                 
                 geometricSequence.add(circ1);
                 geometricSequence.add(circ2);
-            else
-            end
         end
+        
         function [targetLocation, targetOrientation] = getTarget(...
                 slotX, slotY, slotOrientation, slotLength, slotDepth, carX, carY, carLength, carWidth)
+            %debug = true;
+            debug = false;
+            
             % since the target direction is the same as the slot direction
             % => (direction is normalized due to sin/cos properties)
             targetOrientation = slotOrientation;
@@ -255,6 +289,18 @@ classdef ParkingPilot < handle
                 ... offset calculated above
                 sgn * ((slotLength / 2) - offsetFrontBack) * targetDirection +...
                 [0; slotDepth / 2 - carWidth / 2 - 0.05 * carLength];
+            
+            if debug
+                x = [targetLocation(1) - carLength / 2, targetLocation(1) + carLength / 2, targetLocation(1) + carLength / 2, targetLocation(1) - carLength / 2];
+                y = [targetLocation(2) - carWidth / 2, targetLocation(2) - carWidth / 2, targetLocation(2) + carWidth / 2, targetLocation(2) + carWidth / 2];
+                fill(x, y, 'y');
+                quiver(targetLocation(1), targetLocation(2), targetDirection(1) * 3, targetDirection(2) * 3, 'Color', 'r');
+                quiver(slotX, slotY, targetDirection(1) * 3, targetDirection(2) * 3, 'Color', 'b');
+                plot(carX, carY, 'bx');
+                x = [slotX + slotLength / 2 slotX + slotLength / 2 slotX - slotLength / 2 slotX - slotLength / 2];
+                y = [slotY + slotDepth / 2 slotY - slotDepth / 2 slotY - slotDepth / 2 slotY + slotDepth / 2];
+                plot(x, y, 'b');
+            end
         end
     end
     
