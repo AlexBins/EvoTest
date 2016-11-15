@@ -1,0 +1,13 @@
+\begin{frame}{Steuersignalerzeugung}
+Im Anschluss an die Geometrieermittlung folgt die Berechnung der Steuersignale.
+
+Es existieren zwei primitive:
+\begin{itemize}
+\item Gerade
+\item Kreise
+\end{itemize}
+Beide sind in Klassen gekapselt, die Schnittstelle
+\[ctrl\_signal = calcCtrlSignal(velocity,\,axis\_length)\]
+dient dann der Erzeugung des Kontrollvektors:
+\[[velocity\,steering\_angle\,duration]\]
+\end{frame}
