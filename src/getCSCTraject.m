@@ -35,6 +35,6 @@ tr = [v1, v2, v3;
 % calc circles
 % tangent
 %tanline = getTanLine(C1.L, C2.R, r, 'LR');
-plot(tl(1,:), tl(2,:))
+%plot(tl(1,:), tl(2,:))
 
 end
