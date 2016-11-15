@@ -1,4 +1,3 @@
-
 function [coll, dist] = fRectDist(A, B)
 % INPUT: A, B - matrices with rectangle coordinates [x;y] for 4 vertices in order: 
 % LowerLeft, LowerRigt, UpRigth, UpLeft
@@ -81,11 +80,9 @@ end
 
 dist = mdist;
 
-
-
-
+if isnan(dist)
+    coll = 1;
+else
+    coll = -1;
 end
-
-
-
-
+end
