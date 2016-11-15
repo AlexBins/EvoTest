@@ -53,7 +53,6 @@ out(a).B = outB;
 [out(a).minB(1,1), out(a).minB(1,2)]  = min(ax'*outB);
 
 % evaluate collision
-coll = 1;
 % check collision and calculate distance in no collision
 % compare scalar values and decide if rectangles overlap
 % TD: write function for euclidian distance
