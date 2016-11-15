@@ -30,7 +30,7 @@ classdef Scenario
             
             obj.CarStartInformation = [obj.Car.GetX(), obj.Car.GetY(), obj.Car.GetOrientationRadians()];
             obj.Collision = false;
-            MinDistance = NaN;
+            obj.MinDistance = NaN;
         end
         
         function ExecuteControlMatrix(self, control_matrix)
@@ -67,7 +67,7 @@ classdef Scenario
                     
                     car_rect = self.Car.GetRectangle();
                     for iElement = 1:length(self.World.RElements)
-                        i_rect = self.World.RElements(i).GetRectangle();
+                        i_rect = self.World.RElements(iElement).GetRectangle();
                         
                         [doCollide, distance] = fRectDist(car_rect, i_rect);
                         
@@ -76,8 +76,10 @@ classdef Scenario
                         end
                         if isnan(self.MinDistance)
                             self.MinDistance = distance;
-                        elseif ~isnan(distance) && distance < self.MinDistance
-                            self.MinDistance = distance;
+                        elseif (~isnan(distance))
+                            if (distance < self.MinDistance)
+                                self.MinDistance = distance;
+                            end
                         end
                     end
                     % Log the new positions

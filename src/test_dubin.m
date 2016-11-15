@@ -25,3 +25,6 @@ end
 sc.ExecuteControlMatrix(ctrl_mat);
 sc.ExecuteControlMatrix(gs.getControlMatrix(1, sc.Car.Width));
 sc.Replay(1 / 60, 1);
+
+sc.MinDistance
+sc.Collision

@@ -35,6 +35,8 @@ classdef RectangularElement < Element
         end
         
         function rect = GetRectangle(self)
+            x = self.GetX();
+            y = self.GetY();
             rect = CreateRectangle(x - self.Width / 2, y - self.Height / 2, self.Width, self.Height);
         end
     end
