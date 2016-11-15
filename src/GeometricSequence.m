@@ -3,7 +3,7 @@ classdef GeometricSequence < handle
     %       supports generating a control matrix out of the PlanObject
     %       sequence
     
-    properties (Access = private)
+    properties% (Access = private)
         Sequence
     end
     

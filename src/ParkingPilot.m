@@ -7,7 +7,7 @@ classdef ParkingPilot < handle
     
     methods (Static)
         function [isDirectParkingPossibly, geometricSequence, dubinTarget, dubinOrientation] = tryDirectParking(carX, carY, carOrientation, targetX, targetY, targetOrientation, topofslot, minRadius)
-            %debug = true;
+           % debug = true;
             debug = false;
             
             % initialize the results
@@ -134,7 +134,7 @@ classdef ParkingPilot < handle
                 dubinTarget = circcar + targetn * radcar;
                 
                 ParkingPilot.fillWithElements(geometricSequence,...
-                    dubinTarget, targetn, targetl, targetn, circcar, circtarget,...
+                    dubinTarget, -targetn, targetl, targetn, circcar, circtarget,...
                     radcar, radtarget, targetd, targetd, debug);
                 
                 if debug
