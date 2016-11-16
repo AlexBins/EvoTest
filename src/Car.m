@@ -46,7 +46,8 @@ classdef Car < RectangularElement
             end
             % get the current state that has to be modified
             % in order to apply a simple matrix multiplication
-            state = [self.GetX(); self.GetY(); self.GetOrientationRadians()];
+            offset = [cos(self.GetOrientationRadians()) sin(self.GetOrientationRadians())] * self.Width/2;
+            state = [self.GetX()-offset(1); self.GetY()-offset(2); self.GetOrientationRadians()];
                     
             % generate control matrix:
             % position is moved by velocity in a certain direction (x,y)
@@ -56,8 +57,9 @@ classdef Car < RectangularElement
             new_state = state  + control * velocity;
             
             % apply the new state vector to the car
-            self.SetLocation(new_state(1), new_state(2));
             self.SetOrientationAngle(new_state(3));
+            offset = [cos(self.GetOrientationRadians()) sin(self.GetOrientationRadians())] * self.Width/2;
+            self.SetLocation(new_state(1)+offset(1), new_state(2)+offset(2));
         end
     end
     
