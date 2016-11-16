@@ -37,20 +37,20 @@ function [ handle ] = plotCircle( x, y, radius, varargin )
     subdivides_for_radius_one = 8 * 4; % 8 Abschnitte pro Viertel-Kreis
     subdivides = ceil(subdivides_for_radius_one * radius);
     if direction > 0
-        if beta < alpha
+        if beta <= alpha
             beta = beta + 2 * pi;
         end
     else
-        if alpha < beta
+        if alpha <= beta
             alpha = alpha + 2 * pi;
         end
     end
     
     step = (beta - alpha) / subdivides;
     angles = alpha:step:beta;
-    x = cos(angles) * radius;
-    y = sin(angles) * radius;
+    X = cos(angles) * radius + x;
+    Y = sin(angles) * radius + y;
     
-    handle = plot(x, y, style);
+    handle = plot(X, Y, style);
 end
 
