@@ -155,11 +155,11 @@ classdef ParkingPilot < handle
                 % angle with absolut value smaller or equal to 90 degree
                 % => turn it when the direction vector points rather left
                 % than right
-                if carn(1) < 0
+                if carn(1) > 0
                     entryAngleCar = pi - entryAngleCar;
                 end
                 exitAngleTarget = asin(-targetn(2));
-                if targetn(1) < 0
+                if targetn(1) > 0
                     exitAngleTarget = pi - exitAngleTarget;
                 end
                 

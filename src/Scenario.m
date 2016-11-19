@@ -73,6 +73,8 @@ classdef Scenario < handle
                         
                         if doCollide == 1
                             self.Collision = true;
+                            self.Trajectory.LogCar(self.Car, dt);
+                            return;
                         end
                         if isnan(self.MinDistance)
                             self.MinDistance = distance;
