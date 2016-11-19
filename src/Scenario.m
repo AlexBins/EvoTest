@@ -43,6 +43,7 @@ classdef Scenario < handle
             
             % iterate over the control matrix
             for idx=1:size(control_matrix, 1)
+                
                 % receive the currenct control vector
                 ctr_vector = control_matrix(idx, :);
                 % Extract the single values out of the vector
@@ -62,6 +63,9 @@ classdef Scenario < handle
                 dt = duration / n;
                 % Now move the car the calculated amount of times
                 for i = 1:n
+                    if self.Collision
+                        return;
+                    end
                     % move the car according to the provided information
                     self.Car.Move(velocity, steering_angle, dt);
                     
@@ -73,8 +77,6 @@ classdef Scenario < handle
                         
                         if doCollide == 1
                             self.Collision = true;
-                            self.Trajectory.LogCar(self.Car, dt);
-                            return;
                         end
                         if isnan(self.MinDistance)
                             self.MinDistance = distance;
@@ -130,7 +132,7 @@ classdef Scenario < handle
             self.Trajectory = Trajectory();
             minr = self.Car.Width / tan(self.Car.maxSteeringAngle);
             
-            [tl, to] = ParkingPilot.getTarget(...
+            [tl, to, leftOfSlot] = ParkingPilot.getTarget(...
                 pLoc(1), pLoc(2), pOr, pLength, pWidth,...
                 self.Car.GetX(), self.Car.GetY(),...
                 self.Car.Width, self.Car.Height);
@@ -140,7 +142,7 @@ classdef Scenario < handle
                 ParkingPilot.tryDirectParking(...
                 self.Car.GetX(), self.Car.GetY(),...
                 self.Car.GetOrientationRadians(), ...
-                tl(1), tl(2), to, 1, minr);
+                tl(1), tl(2), to, 1, minr, leftOfSlot);
             
             if ~directParkingPossible
                 ctrl_mat = getDubinsPath(...
