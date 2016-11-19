@@ -9,6 +9,7 @@ classdef PlanCircle < PlanObject
         RadiansStart;
         RadiansEnd;
         Direction;
+        Forward;
     end
     
     methods
@@ -19,26 +20,57 @@ classdef PlanCircle < PlanObject
             % radiansEnd: the end angle in radians, where the car stops
             % driving
             plan.Radius = radius;
-            plan.RadiansStart = radiansStart;
-            plan.RadiansEnd = radiansEnd;
+            plan.RadiansStart = mod(radiansStart, 2 * pi);
+            plan.RadiansEnd = mod(radiansEnd, 2 * pi);
             plan.Direction = direction;
+            plan.Forward = 1;
         end
         
         function ctrl_signal = CalculateControlSignal(self, velocity, axisDistance)
+            debug = false;
+            
             % Based on the shape, calculate the (velocity,
             % steering_angle, duration) tuple from the velocity and the
             % distance between the axis
-            if self.Direction
+            if sign(self.Direction) == +1
                 dAngle = self.RadiansEnd - self.RadiansStart;
             else
                 dAngle = self.RadiansStart - self.RadiansEnd;
             end
-            steering_angle = atan(axisDistance/self.Radius);
+            dAngle = mod(dAngle + 2 * pi, 2 * pi);
+            
+            % steering direction:
+            % bool: 1       | 0
+            % f =   forward | backward
+            % d =   clockw  | counterclockw
+            % steer = left  | right
+            %
+            % f | d || s
+            % 1 | 1 || 1
+            % 1 | 0 || 0
+            % 0 | 1 || 0
+            % 0 | 0 || 1
+            % 
+            % numeric: s = f * d since s = +1 = left s= -1 = right
+            
+            steer = sign(self.Direction) * sign(self.Forward);
+            steering_angle = atan(axisDistance/self.Radius) * steer;
             distance = dAngle*self.Radius;
-            duration = distance / velocity;
-            ctrl_signal = [velocity steering_angle duration];
+            duration = abs(distance / velocity);
+            v = velocity * sign(self.Forward);
+            ctrl_signal = [v steering_angle duration];
+            if debug
+                if sign(self.Direction) == +1
+                    start = self.RadiansStart;
+                else
+                    start = self.RadiansEnd;
+                end
+                rad = start:0.1:dAngle + start;
+                X = cos(rad) * self.Radius + self.PosX;
+                Y = sin(rad) * self.Radius + self.PosY;
+                plot(X, Y, 'r');
+            end
         end
     end
-    
 end
 

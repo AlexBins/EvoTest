@@ -16,7 +16,7 @@ classdef Car < RectangularElement
             if ~isempty(varargin)
                 obj.maxSteeringAngle = varargin{1};
             else
-                obj.maxSteeringAngle = pi/2;
+                obj.maxSteeringAngle = pi/4;
             end
             obj.dt = 0.1;
         end

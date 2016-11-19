@@ -1,28 +1,43 @@
+% Deprecated. Doesn't work due to the used car model
+
 figure;
 hold on;
 dim = 6;
 axis([-dim / 2 dim / 2 -dim / 2 dim / 2]);
-plot([-1.5 1.5 1.5 -1.5 -1.5], [1 1 0 0 1], 'k');
+plot([-dim / 2 dim / 2], [0 0], 'k:');
+plot([0 0], [-dim / 2 dim / 2], 'k:');
+carWidth = 1;
+carLength = 3;
+axisDistance = 2;
+plot([-carLength / 2 carLength / 2 carLength / 2 -carLength / 2 -carLength / 2], [carWidth / 2 carWidth / 2 -carWidth / 2 -carWidth / 2 carWidth / 2], 'k');
 
-plot([-1 -1], [1 0], 'k-.');
-plot([1 1], [1 0], 'k-.');
+plot([-axisDistance / 2  -axisDistance / 2], [carWidth / 2 -carWidth / 2], 'k-.');
+plot([axisDistance / 2 axisDistance / 2], [carWidth / 2 -carWidth / 2], 'k-.');
 
-plot([-2 0], [0 1], 'r:');
-plot([2 0], [0 1], 'r:');
+plot([-axisDistance / 2 - 1 -axisDistance / 2 + 1], [-0.5 0.5], 'r:');
+plot([axisDistance / 2 + 1 axisDistance / 2 - 1], [-0.5 0.5], 'r:');
 
-c = [0 -1.5];
-r = norm(c - [1 0.5]);
+c = [0 -2];
+axisCenter = [-axisDistance / 2, 0];
+radius = norm(c - axisCenter);
 
-viscircles(c, [r], 'Color', 'b', 'LineStyle', '--');
+viscircles(c, [radius], 'Color', 'b', 'LineStyle', '--');
 
-plot([-1 0], [0.5 -1.5], 'b:');
-plot([1 0], [0.5 -1.5], 'b:');
+plot([-axisDistance / 2, 0], [0, -2], 'b:');
+plot([axisDistance / 2, 0], [0, -2], 'b:');
 
-r = norm(c - [-1.5 1]);
-viscircles(c, [r], 'Color', 'r', 'LineStyle', '--');
+topLeft = [-carLength / 2, carWidth / 2];
 
-r = norm(c - [0 0]);
-viscircles(c, [r], 'Color', 'r', 'LineStyle', '--');
+radius = norm(c - topLeft);
+viscircles(c, [radius], 'Color', 'r', 'LineStyle', '--');
 
-plot([-1.1 -0.9], [0.45, 0.55], 'r', 'LineWidth', 2);
-plot([1.1 0.9], [0.45, 0.55], 'r', 'LineWidth', 2);
+botCenter = [0, -carWidth / 2];
+
+radius = norm(c - botCenter);
+viscircles(c, [radius], 'Color', 'r', 'LineStyle', '--');
+
+plot([-axisDistance / 2 - 0.2, -axisDistance / 2 + 0.2], [-0.1 0.1], 'r', 'LineWidth', 2);
+plot([axisDistance / 2 + 0.2, axisDistance / 2 - 0.2], [-0.1 0.1], 'r', 'LineWidth', 2);
+
+r = PlanCircle.getOuterRadius(norm(c - axisCenter), carWidth, carLength, axisDistance);
+viscircles(c, [r], 'Color', 'r', 'LineStyle', ':');
