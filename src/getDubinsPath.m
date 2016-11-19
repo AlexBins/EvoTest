@@ -15,7 +15,7 @@ function tr_out = getDubinsPath(S, G, r )
 % Find shortest CSC trajectory, forward
 min_csc = NaN;
 for i = {'RSR', 'RSL', 'LSL', 'LSR'}
-csc = getCSCTraject(S, G, r, cell2mat(i));
+[csc, hc1, hc2, hl] = getCSCTraject(S, G, r, cell2mat(i));
 if ~isnan(csc) 
 if (isnan(min_csc)) || (min_csc > sum(csc(3,:), 2))
 min_csc = sum(csc(3,:), 2);
@@ -54,5 +54,6 @@ tr_out(1,:) = -1*tr_out(1,:);
 else
     tr_out = tr_opt; % if no improvement use the intially calculated trajectory
 end
+
 end
 
