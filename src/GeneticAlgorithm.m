@@ -43,10 +43,41 @@ classdef GeneticAlgorithm
     
     methods
         function main(self)
+            % Initialize the population
+            self.Initialize();
+            
+            % Calculate each candidate's fitness
+            for i = 1:self.PopulationSize
+                % TODO: Assume struct.Fitness exists
+                self.Population(i).Fitness =...
+                    self.FitnessFunction(self.Population(i));
+            end
+            
+            % Get the amount of candidates to be created per epoch
+            nNewCandidatesPerEpoch =...
+                self.ReproductionRate * self.PopulationSize;
+            nNewCandidatesPerEpoch = ceil(nNewCandidatesPerEpoch);
+            
+            % Enter the epoch loop
+            while true
+                self.Epoch = self.Epoch + 1;
+                
+                for i = 1:nNewCandidatesPerEpoch
+                    parent1 = self.SelectCandidateFunction(self.Population);
+                    parent2 = self.SelectCandidateFunction(self.Population);
+                    
+                    newCandidate = self.MergeFunction(parent1, parent2);
+                    newCandidate = self.MutateFunction(newCandidate);
+                    
+                    self.AddToPopulation(newCandidate);
+                end
+                
+                self.ReducePopulation();
+            end
             % TODO: implement
         end
         
-        function Initialise(self)
+        function Initialize(self)
             % TODO: implement
         end
         
