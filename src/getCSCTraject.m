@@ -1,19 +1,39 @@
-function tr = getCSCTraject(sp, gp, r, type)
+function [tr, handlec1, handlec2, handlel1] = getCSCTraject(sp, gp, r, type)
+debug = false;
+
 % calc CSC trajectory 
 vel = 1;
 % get cirles
 crc1 = [sp(1)+ getEncDir(type, 1)* r*cos(sp(3)-pi/2), sp(2)+ getEncDir(type, 1)*r*sin(sp(3)-pi/2)];
 crc2 = [gp(1)+ getEncDir(type, 3)*r*cos(gp(3)-pi/2), gp(2)+getEncDir(type, 3)*r*sin(gp(3)-pi/2)];
+
+if debug
+    handlec1 = viscircles(crc1, r, 'Color', 'y');
+    handlec2 = viscircles(crc2, r, 'Color', 'y');
+else
+    handlec1 = [];
+    handlec2 = [];
+end
+
 % set constant speed, forward direction for all phases
 v1 = vel;
 v2 = vel;
 v3 = vel;
 % get tangent
 tl = getTanLine(crc1, crc2, r, strcat(type(1), type(3)));
+
 if isnan(tl)
     tr = NaN;
+    handlel1 = [];
     return;
 end
+
+if debug
+    handlel1 = plot(tl(1, :), tl(2, :), 'y');
+else
+    handlel1 =[];
+end
+
 tl_length = ((tl(1,2)-tl(1, 1))^2 + (tl(2,2)-tl(2, 1))^2)^0.5;
 % get arcs
 al1 = getArcLength(crc1, sp(1:2), tl(:,1)', r, getEncDir(type, 1));

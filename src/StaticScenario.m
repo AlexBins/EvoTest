@@ -5,15 +5,20 @@ classdef StaticScenario < Scenario
     properties
         parkingSlot
     end
-    
+
     methods
-        function obj = StaticScenario(carX, carY, carAngle)
+        function obj = StaticScenario(carX, carY, carAngle, varargin)
             obj = obj@Scenario(0.5, 1, [], []);
             
             carWidth = 1.125;
             carHeight = 0.75;
-            slotWidth = 2 * carWidth;
-            slotDepth = 1;
+            if isempty(varargin)
+                slotWidth = 2 * carWidth;
+                slotDepth = 1;
+            else
+               slotWidth = varargin{1};
+               slotDepth = varargin{2};
+            end
             
             street = Street([-3 0; 3 0], [0 0], [0 0]);
             [slotLoc, slotDir] = street.GetLocation(0.5, 1, 1 / 2);
@@ -37,30 +42,11 @@ classdef StaticScenario < Scenario
             obj.parkingSlot = RectangularElement(slotLoc(1), slotLoc(2), slotWidth, slotDepth, 0);
         end
         
-        function test(self)
-            debug = false;
-            
-            msa = self.Car.maxSteeringAngle;
-            minr = self.Car.Width / tan(msa);
-            [tl, to] = ParkingPilot.getTarget(...
-                self.parkingSlot.GetX(), self.parkingSlot.GetY(),...
-                self.parkingSlot.GetOrientationRadians(), ...
-                self.parkingSlot.Width, self.parkingSlot.Height,...
-                self.Car.GetX(), self.Car.GetY(),...
-                self.Car.Width, self.Car.Height);
-            [ip, gs, dl, do] = ParkingPilot.tryDirectParking(...
-                self.Car.GetX(), self.Car.GetY(),...
-                self.Car.GetOrientationRadians(), ...
-                tl(1), tl(2), to, 1, minr);
-            
-            if debug
-                drawGS(gs);
-            end
-            
-            if ip
-                cm = gs.getControlMatrix(1, self.Car.Width);
-                self.ExecuteControlMatrix(cm);
-            end
+        function [minDist, collision] = RunParkingPilot(self)
+            [minDist, collision] = self.RunParkingPilot@Scenario(...
+                [self.parkingSlot.GetX(); self.parkingSlot.GetY()],...
+                self.parkingSlot.GetOrientationRadians(),...
+                self.parkingSlot.Width, self.parkingSlot.Height);
         end
         
         function DisplayScenario(self, time)

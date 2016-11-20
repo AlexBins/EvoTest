@@ -6,8 +6,9 @@ classdef ParkingPilot < handle
     end
     
     methods (Static)
-        function [isDirectParkingPossibly, geometricSequence, dubinTarget, dubinOrientation] = tryDirectParking(carX, carY, carOrientation, targetX, targetY, targetOrientation, topofslot, minRadius)
-           % debug = true;
+        function [isDirectParkingPossibly, geometricSequence, dubinTarget, dubinOrientation] =...
+                tryDirectParking(carX, carY, carOrientation, targetX, targetY, targetOrientation, topofslot, minRadius, targetLeftOfSlot)
+            %debug = true;
             debug = false;
             
             % initialize the results
@@ -125,7 +126,12 @@ classdef ParkingPilot < handle
                     circcar, circtarget, radcar, radtarget,...
                     card, targetd, debug);
             else % direct parking not possible => get dubin target position
-                dir = turn2DVec(targetd, 7 * pi / 6);
+                if targetLeftOfSlot
+                    amount = -1;
+                else
+                    amount = 1;
+                end
+                dir = turn2DVec(targetn, amount * 4 * pi / 6);
                 dir = dir / norm(dir);
                 circcar = circtarget + dir * 2 * minRadius;
                 radcar = minRadius;
@@ -155,11 +161,11 @@ classdef ParkingPilot < handle
                 % angle with absolut value smaller or equal to 90 degree
                 % => turn it when the direction vector points rather left
                 % than right
-                if carn(1) < 0
+                if carn(1) > 0
                     entryAngleCar = pi - entryAngleCar;
                 end
                 exitAngleTarget = asin(-targetn(2));
-                if targetn(1) < 0
+                if targetn(1) > 0
                     exitAngleTarget = pi - exitAngleTarget;
                 end
                 
@@ -233,7 +239,7 @@ classdef ParkingPilot < handle
                 geometricSequence.add(circ2);
         end
         
-        function [targetLocation, targetOrientation] = getTarget(...
+        function [targetLocation, targetOrientation, targetLeftOfSlot] = getTarget(...
                 slotX, slotY, slotOrientation, slotLength, slotDepth, carX, carY, carLength, carWidth)
             %debug = true;
             debug = false;
@@ -270,10 +276,16 @@ classdef ParkingPilot < handle
                 sgn = -1;
             end
             
+            if sgn == -1
+                targetLeftOfSlot = true;
+            else
+                targetLeftOfSlot = false;
+            end
+            
             % calculating the distance for the target location to the car
             % center
             % TODO: currently using abosult values (0.25). Try calculating the outer radius of the car edges or something like this 
-            offsetFrontBack = carLength / 2 + carWidth  * 0.05;
+            offsetFrontBack = carLength / 2 + carWidth  * 0.1;
             
             % if the car is to the left of the slot => position the target
             % IN POITIVE slot direction at the closest point to the street
@@ -288,7 +300,7 @@ classdef ParkingPilot < handle
                 ... Move to the front / back of the parking slot with
                 ... offset calculated above
                 sgn * ((slotLength / 2) - offsetFrontBack) * targetDirection +...
-                [0; slotDepth / 2 - carWidth / 2 - 0.05 * carLength];
+                [0; slotDepth / 2 - carWidth / 2 - 0.1 * carLength];
             
             if debug
                 x = [targetLocation(1) - carLength / 2, targetLocation(1) + carLength / 2, targetLocation(1) + carLength / 2, targetLocation(1) - carLength / 2];

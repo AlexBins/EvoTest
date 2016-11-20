@@ -1,4 +1,4 @@
-classdef Scenario
+classdef Scenario < handle
     %SCENARIO Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -43,6 +43,7 @@ classdef Scenario
             
             % iterate over the control matrix
             for idx=1:size(control_matrix, 1)
+                
                 % receive the currenct control vector
                 ctr_vector = control_matrix(idx, :);
                 % Extract the single values out of the vector
@@ -62,6 +63,9 @@ classdef Scenario
                 dt = duration / n;
                 % Now move the car the calculated amount of times
                 for i = 1:n
+                    if self.Collision
+                        return;
+                    end
                     % move the car according to the provided information
                     self.Car.Move(velocity, steering_angle, dt);
                     
@@ -86,6 +90,7 @@ classdef Scenario
                     self.Trajectory.LogCar(self.Car, dt);
                 end
             end
+            
         end
         
         function DriveCircle(self, velocity, steering_angle, duration, dt)
@@ -120,6 +125,47 @@ classdef Scenario
                 self.DisplayScenario(t);
                 pause(deltaT / speedupfactor);
             end
+        end
+        
+        function [minDist, collision] = RunParkingPilot(self,...
+                pLoc, pOr, pLength, pWidth)
+            self.Trajectory = Trajectory();
+            minr = self.Car.Width / tan(self.Car.maxSteeringAngle);
+            
+            [tl, to, leftOfSlot] = ParkingPilot.getTarget(...
+                pLoc(1), pLoc(2), pOr, pLength, pWidth,...
+                self.Car.GetX(), self.Car.GetY(),...
+                self.Car.Width, self.Car.Height);
+            
+            [directParkingPossible, directParkingSequence,...
+                dubinsLocation, dubinsOrientation] = ...
+                ParkingPilot.tryDirectParking(...
+                self.Car.GetX(), self.Car.GetY(),...
+                self.Car.GetOrientationRadians(), ...
+                tl(1), tl(2), to, 1, minr, leftOfSlot);
+            
+            if ~directParkingPossible
+                ctrl_mat = getDubinsPath(...
+                    [self.Car.GetX() self.Car.GetY() self.Car.GetOrientationRadians()],...
+                    [dubinsLocation(1) dubinsLocation(2) dubinsOrientation], minr);
+                ctrl_mat = transpose(ctrl_mat);
+
+                for i = 1:3
+                    if ctrl_mat(i, 2) > 0
+                        ctrl_mat(i, 2) = -self.Car.maxSteeringAngle;
+                    elseif ctrl_mat(i, 2) < 0
+                        ctrl_mat(i, 2) = self.Car.maxSteeringAngle;
+                    end
+                end
+
+                self.ExecuteControlMatrix(ctrl_mat);
+            end
+            
+            self.ExecuteControlMatrix(directParkingSequence.getControlMatrix(...
+                1, self.Car.Width));
+            
+            minDist = self.MinDistance;
+            collision = self.Collision;
         end
     end
     

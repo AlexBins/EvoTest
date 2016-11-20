@@ -1,0 +1,33 @@
+\begin{frame}{Steuersignalerzeugung}
+Im Anschluss an die Geometrieermittlung folgt die Berechnung der Steuersignale.
+
+Es existieren zwei primitive:
+\begin{itemize}
+\item Gerade
+\item Kreise
+\end{itemize}
+Beide sind in Klassen gekapselt, die Schnittstelle
+\[ctrl\_signal = calcCtrlSignal(velocity,\,axis\_length)\]
+dient dann der Erzeugung des Kontrollvektors:
+\[[velocity\,steering\_angle\,duration]\]
+\end{frame}
+
+\subsection{Geraden}
+\begin{frame}{Steuersignale -- Geraden}
+Für geraden ist die Steuersignalerzeugung trivial:
+\begin{itemize}
+\item Der Lenkwinkel ist Null
+\item Die Dauer des Steuersignals ist abhängig von der zurückzulegenden Entfernung $x$ und der Geschwindigkeit $v$ und kann aus $v=\frac{s}{t}$ abgeleitet werden: $t=\frac{s}{v}$
+\end{itemize}
+Die Geschwindigkeit entspricht der gewünschten Geschwindigkeit.
+\end{frame}
+
+\subsection{Kreise}
+\begin{frame}{Steuersignalerzeugung -- Kreise}
+Kreise sind komplexer:
+\begin{itemize}
+\item Der Lenkwinkel hängt von der Krümmung des Kreises und damit von dessen Radius sowie dem Achsabstand ab:  $atan(achsabstand/radius)$
+\item Die Dauer hängt von der Wunschgeschwindigkeit und der Länge des Kreissegments ab: \[\frac{Winkelsumme\cdot Radius}{Geschwindigkeit}\]
+\end{itemize}
+Die Geschwindigkeit entspricht der gewünschten Geschwindigkeit.
+\end{frame}
