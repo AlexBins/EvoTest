@@ -17,9 +17,9 @@ classdef SelectCandidateFactory
     end
     
     methods (Static)
-        function selector = get_generic(selector)
+        function sel = get_generic(selector)
             instance = SelectCandidateFactory(selector);
-            selector = @instance.select;
+            sel = @instance.select;
         end
     end
 end

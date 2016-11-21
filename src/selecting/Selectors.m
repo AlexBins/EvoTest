@@ -15,15 +15,15 @@ classdef Selectors
                 n = length(chromosomes);
                 total_fitness = 0;
                 for i = 1:n
-                    total_fitness = total_fitness + chromosomes(i).Fitness;
+                    total_fitness = total_fitness + chromosomes(i).fitnes;
                 end
                 current_fitness = 0;
                 idx = 0;
-                rand_number = randi(total_fitness);
+                rand_number = rand * total_fitness;
                 while current_fitness < rand_number
                     idx = idx + 1;
                     current_fitness =...
-                        current_fitness + chromosomes(idx).Fitness;
+                        current_fitness + chromosomes(idx).fitnes;
                 end
                 selected = chromosomes(idx);
             end

@@ -26,5 +26,10 @@ classdef Cromosome < handle
         end
     end
     
+    methods (Static)
+        function cromosome = get_random()
+            cromosome = Cromosome(rand, rand, rand, rand, rand);
+        end
+    end
 end
 
