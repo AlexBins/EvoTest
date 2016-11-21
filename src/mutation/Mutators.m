@@ -11,8 +11,8 @@ classdef Mutators
             
             function new_value = mutate(old_value)
                 negative = dec2bin(old_value<0);
-                new_genom = sign_flipper(negative);
-                negative = bin2dec(new_genom(1));
+                sign_flip = sign_flipper(negative);
+                negative = bin2dec(sign_flip(1));
                 
                 new_value = flipper(abs(old_value));
                 if negative
@@ -25,14 +25,13 @@ classdef Mutators
         
         function mutator = get_unsignedUniformFlipper(flip_probability, max_value, number_of_decimals)
             flipper = BinaryUtils.get_uniformFlipper(flip_probability);
-            max_bits = round(log2(max_value)+0.5)+number_of_decimals;
             offset = power(10,number_of_decimals);
+            max_bits = round(log2(max_value*offset)+0.5);
             
             function new_value = mutate(old_value)
                 genom = BinaryUtils.to_genom(old_value*offset);
                 genom = BinaryUtils.fill_binary(genom, max_bits);
                 new_genom = flipper(genom);
-                new_genom = new_genom(2:end);
                 new_value = BinaryUtils.to_value(new_genom)/offset;
             end
             
