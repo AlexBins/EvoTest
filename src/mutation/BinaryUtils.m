@@ -10,7 +10,6 @@ classdef BinaryUtils
         
         function flipper = get_uniformFlipper(flip_probability)
             function new_genom = flip(old_genom)
-                old_genom = BinaryUtils.fill_binary(old_genom);
                 number_bits = length(old_genom);
                 new_genom = ''; 
                 for i=1:number_bits
@@ -26,8 +25,7 @@ classdef BinaryUtils
             
         end
         
-        function filled = fill_binary(genom)
-            max_bit = 32;
+        function filled = fill_binary(genom, max_bit)
             filled = '';
             delta = max_bit - length(genom);
             if delta > 0
