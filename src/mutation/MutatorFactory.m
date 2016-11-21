@@ -68,15 +68,18 @@ classdef MutatorFactory
             mutator = MutatorFactory.get_generic(pos_mutator, pos_mutator, theta_mutator, slot_mutator, slot_mutator);
         end
         
-        function mutator = get_genomeUniform(offset, flipt_propbability, max_bit)
-            % generates a uniform binary flipper
-            % OFFSET: the number of included 10^x
-            % FLIPRATE: probability of a single bit to toggle
-            offset = power(10, offset);
-            mut = Mutators.get_uniformFlipper(offset, flipt_propbability, max_bit);
+        function mutator = get_signedGenomeUniform(flip_probability, max_value, number_of_decimals)
+            mut = Mutators.get_signedUniformFlipper(flip_probability, max_value, number_of_decimals);
             mutator = MutatorFactory.get_generic(mut, mut, mut, mut, mut);
         end
-    end
-    
+        
+        function mutator = get_rational(mutation_probability, max_pos, max_slot, number_of_decimals)
+            % generate a mutator, maximal outcome for position and slot
+            pos_mutator = Mutators.get_signedUniformFlipper(mutation_probability, max_pos, number_of_decimals);
+            theta_mutator = Mutators.get_unsignedUniformFlipper(mutation_probability, 2*pi, number_of_decimals);
+            slot_mutator = Mutators.get_unsignedUniformFlipper(mutation_probability, max_slot, number_of_decimals);
+            mutator = MutatorFactory.get_generic(pos_mutator, pos_mutator, theta_mutator, slot_mutator, slot_mutator);
+        end
+    end    
 end
 
