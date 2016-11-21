@@ -1,4 +1,4 @@
-classdef GeneticAlgorithm
+classdef GeneticAlgorithm < handle
     
     properties
         % The amount of candidates that should form the population
@@ -62,6 +62,7 @@ classdef GeneticAlgorithm
             while true
                 self.Epoch = self.Epoch + 1;
                 
+                % Select, merge, mutate and add
                 for i = 1:nNewCandidatesPerEpoch
                     parent1 = self.SelectCandidateFunction(self.Population);
                     parent2 = self.SelectCandidateFunction(self.Population);
@@ -72,9 +73,9 @@ classdef GeneticAlgorithm
                     self.AddToPopulation(newCandidate);
                 end
                 
+                % Reduce the population again
                 self.ReducePopulation();
             end
-            % TODO: implement
         end
         
         function Initialize(self)
@@ -82,11 +83,32 @@ classdef GeneticAlgorithm
         end
         
         function AddToPopulation(self, candidate)
-            % TODO: implement
+            % Set the value first, then add it to the population (If the
+            % Fitness is set second, then it will be lost due to candidate
+            % not inheriting from handle)
+            candidate.fitnes = self.FitnessFunction(candidate);
+            self.Population(length(self.Population) + 1) = candidate;
         end
         
         function ReducePopulation(self)
-            % TODO: implement
+            n = length(self.Population);
+            fitness_values = zeros(n, 1);
+            % Collect all fitness values
+            for i = 1:n
+                fitness_values(i) = self.Population(i).fitnes;
+            end
+            % I(i) returns the index of the fitness_values(i)-th according
+            % chromosome
+            [~, I] = sort(fitness_values, 'descend');
+            % the last few entries in I contain the indexes with the lowest
+            % fitness => trim I to these indexes and sort it, so that the
+            % highest index is at the front. (this is because removing an
+            % element messes with the indexes behind that element => thus
+            % work from back to front)
+            I = sort(I(self.PopulationSize + 1:end), 'descend');
+            for i = 1:length(I)
+                self.Population(I(i)) = [];
+            end
         end
     end
     
