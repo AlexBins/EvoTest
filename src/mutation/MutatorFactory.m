@@ -1,6 +1,5 @@
 classdef MutatorFactory
-    %MUTATORFACTORY Summary of this class goes here
-    %   Detailed explanation goes here
+    % Generate a Mutator that mutatates the values modular
     
     properties
         x_mutator;
@@ -22,12 +21,13 @@ classdef MutatorFactory
         end
         
         function [mutant] = mutate(self, cromosome)
+            % actually mutating all 5 values within a cromosome
             % parse cromosome
-            xpos = 0;
-            ypos = 0;
-            theta = 0;
-            width = 0;
-            length = 0;
+            xpos = cromosome.carx;
+            ypos = cromosome.cary;
+            theta = cromosome.carangle;
+            width = cromosome.slotdepth;
+            length = cromosome.slotlength;
 
             % mutate the actual values
             xpos = self.x_mutator(xpos);
@@ -37,37 +37,45 @@ classdef MutatorFactory
             length = self.length_mutator(length);
 
             % create new storage instance
-            mutant.xpos = xpos;
-            mutant.ypos = ypos;
-            mutant.theta = theta;
-            mutant.width = width;
-            mutant.length = length;
+            mutant = Cromosome(xpos, ypos, theta, length, width);
         end
     end
     
     methods(Static)
         function mutator = get_generic(mut_x, mut_y, mut_theta, mut_width, mut_length)
+            % generate a new mutator instance from the 5 value mutators
+            % provided
             instance = MutatorFactory(mut_x, mut_y, mut_theta, mut_width, mut_length);
             mutator = @instance.mutate;
         end
         
-        function mutator = get_valueUniform(std_deviation)
-            std_mut = Mutators.get_value(std_deviation);
+        function mutator = get_deviatorUniform(std_deviation)
+            % apply a uniform distribution to all 5 values
+            std_mut = Mutators.get_deviator(std_deviation);
             mutator = MutatorFactory.get_generic(std_mut, std_mut, std_mut, std_mut, std_mut);
         end
         
-        function mutator = get_valueCategory(deviation_position, deviation_theta, deviation_slot)
-            pos_mutator = Mutators.get_value(deviation_position);
-            theta_mutator = Mutators.get_value(deviation_theta);
-            slot_mutator = Mutators.get_value(deviation_slot);
-            mutator = MutatorFactory.get_value(pos_mutator, pos_mutator, theta_mutator, slot_mutator, slot_mutator);
+        function mutator = get_deviatorCategory(deviation_position, deviation_theta, deviation_slot)
+            % apply different normal distributions to pos, theta and the
+            % slot
+            pos_mutator = Mutators.get_deviator(deviation_position);
+            theta_mutator = Mutators.get_deviator(deviation_theta);
+            slot_mutator = Mutators.get_deviator(deviation_slot);
+            mutator = MutatorFactory.get_generic(pos_mutator, pos_mutator, theta_mutator, slot_mutator, slot_mutator);
         end
         
-        function mutator = get_genomeUniform(offset, fliprate)
-            mut = Mutators.get_genome(offset, fliprate);
+        function mutator = get_signedGenomeUniform(flip_probability, max_value, number_of_decimals)
+            mut = Mutators.get_signedUniformFlipper(flip_probability, max_value, number_of_decimals);
             mutator = MutatorFactory.get_generic(mut, mut, mut, mut, mut);
         end
-    end
-    
+        
+        function mutator = get_rational(mutation_probability, max_pos, max_slot, number_of_decimals)
+            % generate a mutator, maximal outcome for position and slot
+            pos_mutator = Mutators.get_signedUniformFlipper(mutation_probability, max_pos, number_of_decimals);
+            theta_mutator = Mutators.get_unsignedUniformFlipper(mutation_probability, 2*pi, number_of_decimals);
+            slot_mutator = Mutators.get_unsignedUniformFlipper(mutation_probability, max_slot, number_of_decimals);
+            mutator = MutatorFactory.get_generic(pos_mutator, pos_mutator, theta_mutator, slot_mutator, slot_mutator);
+        end
+    end    
 end
 
