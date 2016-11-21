@@ -14,7 +14,7 @@ classdef Mutators
                 new_genom = sign_flipper(negative);
                 negative = bin2dec(new_genom(1));
                 
-                new_value = flipper(old_value);
+                new_value = flipper(abs(old_value));
                 if negative
                     new_value = -new_value;
                 end

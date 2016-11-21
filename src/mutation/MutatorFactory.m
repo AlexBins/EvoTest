@@ -23,11 +23,11 @@ classdef MutatorFactory
         function [mutant] = mutate(self, cromosome)
             % actually mutating all 5 values within a cromosome
             % parse cromosome
-            xpos = 0;
-            ypos = 0;
-            theta = 0;
-            width = 0;
-            length = 0;
+            xpos = cromosome.carx;
+            ypos = cromosome.cary;
+            theta = cromosome.carangle;
+            width = cromosome.slotdepth;
+            length = cromosome.slotlength;
 
             % mutate the actual values
             xpos = self.x_mutator(xpos);
@@ -37,11 +37,7 @@ classdef MutatorFactory
             length = self.length_mutator(length);
 
             % create new storage instance
-            mutant.xpos = xpos;
-            mutant.ypos = ypos;
-            mutant.theta = theta;
-            mutant.width = width;
-            mutant.length = length;
+            mutant = Cromosome(xpos, ypos, theta, length, width);
         end
     end
     
