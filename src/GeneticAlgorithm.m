@@ -64,7 +64,7 @@ classdef GeneticAlgorithm < handle
             % Calculate each candidate's fitness
             for i = 1:self.PopulationSize
                 % TODO: Assume struct.Fitness exists
-                self.Population(i).Fitness =...
+                self.Population(i).fitnes =...
                     self.FitnessFunction(self.Population(i));
             end
             

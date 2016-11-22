@@ -13,7 +13,6 @@ classdef FitnesFactory
                     penalty = 1;
                 end
                 fitnes = 1/(penalty*min_distance+(1/good_fitnes_limit));
-                scenario.Replay(1/60, 2);
             end
             fitnes_func = @fit;
         end
