@@ -94,26 +94,34 @@ classdef ParkingPilot < handle
             end
             
             % iterative enhancement
-            [tmpx, tmpy, tmpr] = getCircle(circtarget(1), circtarget(2), radtarget,...
-                carl(1), carl(2), carn(1), carn(2), norm(circcar - carl) / norm(carn));
-            circcar = [tmpx; tmpy];
-            radcar = tmpr;
-            
-            if debug
-                plot(circcar(1), circcar(2), 'bx');
-                viscircles([circcar(1) circcar(2)], radcar, 'Color', 'b');
-            end
-            % the radius of the turning circle at the car is the distance
-            % between the target circle center and the car circle center
-            % minus the target circle radius
-            %radcar = norm(circcar - carl);
-            
-            % directparking is only possible if the radius is at least the
-            % minimum turning circle's radius
-            if radcar < minRadius
-                isDirectParkingPossibly = false;
+            vectocross = circcar - carl;
+            lambda = norm(vectocross) / norm(carn);
+            % If the intersection lies "behind" the car location
+            % (perspective: looking in carn direction)
+            if sign(vectocross(1)) == sign(carn(1))
+                [tmpx, tmpy, tmpr] = getCircle(circtarget(1), circtarget(2), radtarget,...
+                    carl(1), carl(2), carn(1), carn(2), lambda);
+                circcar = [tmpx; tmpy];
+                radcar = tmpr;
+
+                if debug
+                    plot(circcar(1), circcar(2), 'bx');
+                    viscircles([circcar(1) circcar(2)], radcar, 'Color', 'b');
+                end
+                % the radius of the turning circle at the car is the distance
+                % between the target circle center and the car circle center
+                % minus the target circle radius
+                %radcar = norm(circcar - carl);
+
+                % directparking is only possible if the radius is at least the
+                % minimum turning circle's radius
+                if radcar < minRadius
+                    isDirectParkingPossibly = false;
+                else
+                    isDirectParkingPossibly = true;
+                end
             else
-                isDirectParkingPossibly = true;
+                isDirectParkingPossibly = false;
             end
             
             % if direct parking is possible, add the circle definitions to
@@ -154,49 +162,17 @@ classdef ParkingPilot < handle
                 carl, carn, targetl, targetn,...
                 circcar, circtarget, radcar, radtarget, card, targetd,...
                 debug)
-                
-                entryAngleCar = asin(-carn(2));
-                % this calculation is robust in comparions to atan
-                % considering division through zero but only returns and
-                % angle with absolut value smaller or equal to 90 degree
-                % => turn it when the direction vector points rather left
-                % than right
-                if carn(1) > 0
-                    entryAngleCar = pi - entryAngleCar;
-                end
-                exitAngleTarget = asin(-targetn(2));
-                if targetn(1) > 0
-                    exitAngleTarget = pi - exitAngleTarget;
-                end
+
+                entryAngleCar = GeometricUtility.GetAngle(carl - circcar);
+                exitAngleTarget = GeometricUtility.GetAngle(targetl - circtarget);
                 
                 cartotarget = circtarget - circcar;
-                cartotarget = cartotarget / norm(cartotarget);
                 
-                exitAngleCar = asin(cartotarget(2));
-                entryAngleTarget = asin(-cartotarget(2));
-                if cartotarget(1) < 0
-                    exitAngleCar = pi - exitAngleCar;
-                else
-                    entryAngleTarget = pi - entryAngleTarget;
-                end
-                
-                distCar = mod(exitAngleCar + 2 * pi - entryAngleCar, 2 * pi);
-                
-                if distCar > pi
-                    dirCar = -1;
-                    distCar = 2 * pi - distCar;
-                else
-                    dirCar = 1;
-                end
-                
-                distTarget = mod(exitAngleTarget + 2 * pi - entryAngleTarget, 2 * pi);
-                
-                if distTarget > pi
-                    dirTarget = -1;
-                    distTarget = 2 * pi - distTarget;
-                else
-                    dirTarget = 1;
-                end
+                exitAngleCar = GeometricUtility.GetAngle(cartotarget);
+                entryAngleTarget = GeometricUtility.GetAngle(-cartotarget);
+
+                dirCar = GeometricUtility.GetShorterDirection(entryAngleCar, exitAngleCar);
+                dirTarget = GeometricUtility.GetShorterDirection(entryAngleTarget, exitAngleTarget);
                 
                 circ1 = PlanCircle(radcar, entryAngleCar, exitAngleCar, dirCar);
                 circ1.PosX = circcar(1);
@@ -207,30 +183,11 @@ classdef ParkingPilot < handle
                 circ2.PosY = circtarget(2);
                 
                 % calculate the driving direction
-                cen = circtarget;
+                targetCrossCircle = cross([targetl - circtarget; 0], [targetd; 0]);
+                targetforward = sign(targetCrossCircle(3)) * dirTarget;
                 
-                outl = targetl;
-                outd = targetd;
-                inl = cen + turn2DVec(outl - cen, -distTarget * dirTarget);
-                ind = turn2DVec(outd, -distTarget * dirTarget);
-                
-                if debug
-                   quiver(inl(1), inl(2), ind(1), ind(2), 'Color', 'r'); 
-                end
-                
-                targetforward = ...
-                    isLeftOfLine(outl, cen, outl + outd) * ...
-                    -isLeftOfLine(outl, cen, inl);
-                
-                cen = circcar;
-                outl = inl;
-                outd = ind;
-                inl = carl;
-                ind = card;
-                
-                carforward = ...
-                    isLeftOfLine(outl, cen, outl + outd) * ...
-                    -isLeftOfLine(outl, cen, inl);
+                carCrossCircle = cross([carl - circcar; 0], [card; 0]);
+                carforward = sign(carCrossCircle(3)) * dirCar;
                 
                 circ1.Forward = carforward;
                 circ2.Forward = targetforward;

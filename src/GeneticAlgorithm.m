@@ -46,6 +46,8 @@ classdef GeneticAlgorithm < handle
             % Initialize the population
             self.Initialize();
             
+            MaxEpoch = 10^6;
+            
             % Calculate each candidate's fitness
             for i = 1:self.PopulationSize
                 % TODO: Assume struct.Fitness exists
@@ -75,6 +77,10 @@ classdef GeneticAlgorithm < handle
                 
                 % Reduce the population again
                 self.ReducePopulation();
+                
+                if self.Epoch >= MaxEpoch
+                    return;
+                end
             end
         end
         

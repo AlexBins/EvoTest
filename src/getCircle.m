@@ -10,6 +10,8 @@ function [ x, y, r ] = getCircle( mx, my, mr, sx, sy, su, sv, lambda_start )
     tolerance = 0.00001;
     
     l = lambda_start;
+    mod = 1;
+    miss = inf;
     while true
         
         x = sx + l * su;
@@ -22,14 +24,15 @@ function [ x, y, r ] = getCircle( mx, my, mr, sx, sy, su, sv, lambda_start )
             return;
         end
         
-        if abs(d1 - r) < tolerance
+        lastmiss = miss;
+        miss = abs(d1 - r);
+        
+        if miss < tolerance
             break;
         end
         
-        if d1 < r
-            mod = -1;
-        else
-            mod = 1;
+        if lastmiss < miss
+            mod = -1 * mod;
         end
         
         off = abs(r - d1) * 0.1;

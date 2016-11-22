@@ -21,7 +21,7 @@ classdef StaticScenario < Scenario
             end
             
             street = Street([-3 0; 3 0], [0 0], [0 0]);
-            [slotLoc, slotDir] = street.GetLocation(0.5, 1, 1 / 2);
+            [slotLoc, slotDir] = street.GetLocation(0.5, 1, slotDepth / 2);
             slotDir = slotDir / sqrt(slotDir(1) ^ 2 + slotDir(2) ^ 2);
             
             
@@ -35,9 +35,9 @@ classdef StaticScenario < Scenario
             obs2 = RectangularElement(slotLoc(1) + slotDir(1) * (slotWidth + carWidth) / 2, slotLoc(2) + slotDir(2) * (slotWidth + carWidth) / 2, carWidth, carHeight, 0);
             obj.World.AddElement(obs2);
             
-            obs3 = RectangularElement(0, 0, 6, 6, 0);
+            obs3 = RectangularElement(0, 0, 6, 1, 0);
             obj.World.AddElement(obs3);
-            obj.World.PlaceElement(obs3, 0.5, 1, slotDepth + 3);
+            obj.World.PlaceElement(obs3, 0.5, 1, slotDepth + 0.5);
             
             obj.parkingSlot = RectangularElement(slotLoc(1), slotLoc(2), slotWidth, slotDepth, 0);
         end
