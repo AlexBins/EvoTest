@@ -42,6 +42,19 @@ classdef GeneticAlgorithm < handle
     end
     
     methods
+        % Class constructor
+        function obj = GeneticAlgorithm(psize, epoch, mutrate, reprate, fitfunc, selcfunc, mergfunc, mutfunc)
+            obj.PopulationSize = psize; 
+            obj.Epoch = epoch;
+            obj.MutationRate = mutrate;
+            obj.ReproductionRate = reprate;
+            obj.FitnessFunction = fitfunc;
+            obj.SelectCandidateFunction = selcfunc;
+            obj.MergeFunction = mergfunc;
+            obj.MutateFunction = mutfunc;
+            %self.Population = NaN;
+            
+        end
         function main(self)
             % Initialize the population
             self.Initialize();
@@ -85,7 +98,19 @@ classdef GeneticAlgorithm < handle
         end
         
         function Initialize(self)
-            % TODO: implement
+            % TODO: implement restrictions to ensure scenario plausibility
+            N = self.PopulationSize;
+            xy_max = 10;
+            xy_min = 0;
+            length_max = 10;
+            length_min = 1;
+            depth_max = 10;
+            depth_min = 1;
+            for i = 1:10
+            %self.Population(i) 
+            t(i) = Cromosome(randi([xy_min xy_max],1,1), randi([xy_min xy_max],1,1), (0 + (2*pi-0).*rand()), randi([length_min length_max],1,1), randi([depth_min depth_max],1,1));  
+            end
+            self.Population  = t;
         end
         
         function AddToPopulation(self, candidate)
