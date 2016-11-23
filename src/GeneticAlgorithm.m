@@ -7,10 +7,6 @@ classdef GeneticAlgorithm < handle
         % The current epoch
         % Number >= 0
         Epoch
-        % The mutation rate
-        % Number 0 <= MutationRate <= 1
-        % TODO: @Manuel Is this still necessary?
-        MutationRate
         % The reproduction rate
         % 0 => not a single new candidate per epoch
         % 1 => 100 % of the current population size new candidates
@@ -43,10 +39,9 @@ classdef GeneticAlgorithm < handle
     
     methods
         % Class constructor
-        function obj = GeneticAlgorithm(psize, epoch, mutrate, reprate, fitfunc, selcfunc, mergfunc, mutfunc)
+        function obj = GeneticAlgorithm(psize, epoch, reprate, fitfunc, selcfunc, mergfunc, mutfunc)
             obj.PopulationSize = psize; 
             obj.Epoch = epoch;
-            obj.MutationRate = mutrate;
             obj.ReproductionRate = reprate;
             obj.FitnessFunction = fitfunc;
             obj.SelectCandidateFunction = selcfunc;
@@ -55,11 +50,11 @@ classdef GeneticAlgorithm < handle
             %self.Population = NaN;
             
         end
-        function main(self)
+        function main(self, max_epoch)
             % Initialize the population
             self.Initialize();
             
-            MaxEpoch = 10^6;
+            MaxEpoch = max_epoch;
             
             % Calculate each candidate's fitness
             for i = 1:self.PopulationSize
@@ -75,8 +70,8 @@ classdef GeneticAlgorithm < handle
             
             % Enter the epoch loop
             while true
+                disp(sprintf('executing %d', self.Epoch));
                 self.Epoch = self.Epoch + 1;
-                
                 % Select, merge, mutate and add
                 for i = 1:nNewCandidatesPerEpoch
                     parent1 = self.SelectCandidateFunction(self.Population);

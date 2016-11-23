@@ -78,7 +78,7 @@ classdef MutatorFactory
         end
         
         function mutator = get_range(flip_probability)
-            mut = Mutators.get_range_flipper(flip_probability, 8);
+            mut = Mutators.get_range_flipper(flip_probability);
             mutator = MutatorFactory.get_generic(mut, mut, mut, mut, mut);
         end
     end    
