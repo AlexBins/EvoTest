@@ -4,7 +4,7 @@ rational = MutatorFactory.get_range(0.1);
 
 % a fitnes function
 % 50 is the maximal value of the fitnes
-fit = FitnesFactory.get_simple(50);
+fit = FitnesFactory.get_desired_mindistance(50, 0.05);
 
 % a selector
 select =  SelectCandidateFactory.get_generic(Selectors.get_uniform());

@@ -35,6 +35,9 @@ classdef GeneticAlgorithm < handle
         % Function needs to accept a struct (candidate) as input and return
         % a mutated version of it
         MutateFunction
+        % For debug purposes: Stores the maximum fitness value in the
+        % population
+        max_fitnes
     end
     
     methods
@@ -48,6 +51,7 @@ classdef GeneticAlgorithm < handle
             obj.MergeFunction = mergfunc;
             obj.MutateFunction = mutfunc;
             %self.Population = NaN;
+            obj.max_fitnes = 0;
             
         end
         function main(self, max_epoch, varargin)
@@ -79,6 +83,7 @@ classdef GeneticAlgorithm < handle
                 % TODO: Assume struct.Fitness exists
                 self.Population(i).fitnes =...
                     self.FitnessFunction(self.Population(i));
+                self.max_fitnes = max(self.max_fitnes, self.Population(i).fitnes);
             end
             end_time()
             
@@ -123,6 +128,7 @@ classdef GeneticAlgorithm < handle
             length_min = 1;
             depth_max = 10;
             depth_min = 1;
+            t = Cromosome.empty;
             for i = 1:10
             %self.Population(i) 
             t(i) = Cromosome(randi([xy_min xy_max],1,1), randi([xy_min xy_max],1,1), (0 + (2*pi-0).*rand()), randi([length_min length_max],1,1), randi([depth_min depth_max],1,1));  
@@ -135,6 +141,7 @@ classdef GeneticAlgorithm < handle
             % Fitness is set second, then it will be lost due to candidate
             % not inheriting from handle)
             candidate.fitnes = self.FitnessFunction(candidate);
+            self.max_fitnes = max(self.max_fitnes, candidate.fitnes);
             self.Population(length(self.Population) + 1) = candidate;
         end
         
