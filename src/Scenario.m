@@ -51,7 +51,7 @@ classdef Scenario < handle
                 steering_angle = ctr_vector(2);
                 duration = ctr_vector(3);
                 % Calculate the maximum possible dt
-                max_dt = 0.1 / abs(velocity);
+                max_dt = 0.5 / abs(velocity);
                 % Get the amount the maximum possible dt would be needed to
                 % run the current control vector
                 n = duration / max_dt;

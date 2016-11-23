@@ -50,18 +50,37 @@ classdef GeneticAlgorithm < handle
             %self.Population = NaN;
             
         end
-        function main(self, max_epoch)
+        function main(self, max_epoch, varargin)
+            if length(varargin) >= 1 && varargin{1}
+                prnt = @(x) fprintf([x '\n']);
+            else
+                prnt = @Utility.DoNothing;
+            end
+            if length(varargin) >= 2 && varargin{2}
+                start_time = @tic;
+                end_time = @toc;
+            else
+                start_time = @Utility.DoNothing;
+                end_time = @Utility.DoNothing;
+            end
             % Initialize the population
+            
+            prnt('Init\n');
+            start_time();
             self.Initialize();
+            end_time()
             
             MaxEpoch = max_epoch;
             
+            prnt('First fitness calculation\n');
+            start_time();
             % Calculate each candidate's fitness
             for i = 1:self.PopulationSize
                 % TODO: Assume struct.Fitness exists
                 self.Population(i).fitnes =...
                     self.FitnessFunction(self.Population(i));
             end
+            end_time()
             
             % Get the amount of candidates to be created per epoch
             nNewCandidatesPerEpoch =...
@@ -70,9 +89,11 @@ classdef GeneticAlgorithm < handle
             
             % Enter the epoch loop
             while true
-                disp(sprintf('executing %d', self.Epoch));
+                prnt('starting epoch %d\n', self.Epoch);
                 self.Epoch = self.Epoch + 1;
                 % Select, merge, mutate and add
+                prnt('creating %d new candidates\n', nNewCandidatesPerEpoch);
+                start_time();
                 for i = 1:nNewCandidatesPerEpoch
                     parent1 = self.SelectCandidateFunction(self.Population);
                     parent2 = self.SelectCandidateFunction(self.Population);
@@ -82,6 +103,7 @@ classdef GeneticAlgorithm < handle
                     
                     self.AddToPopulation(newCandidate);
                 end
+                end_time()
                 
                 % Reduce the population again
                 self.ReducePopulation();
