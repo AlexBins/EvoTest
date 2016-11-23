@@ -37,5 +37,16 @@ classdef Mutators
             
             mutator = @mutate;
         end
+        
+        function mutator = get_range_flipper(flip_probability)
+            flipper = BinaryUtils.get_uniformFlipper(flip_probability);
+            function new_value = mutate(old_value)
+                genom = BinaryUtils.to_genom(old_value);
+                genom = BinaryUtils.fill_binary(genom, 8);
+                new_genom = flipper(genom);
+                new_value = BinaryUtils.to_value(new_genom);
+            end
+            mutator = @mutate;
+        end
     end
 end

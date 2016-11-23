@@ -76,6 +76,11 @@ classdef MutatorFactory
             slot_mutator = Mutators.get_unsignedUniformFlipper(mutation_probability, max_slot, number_of_decimals);
             mutator = MutatorFactory.get_generic(pos_mutator, pos_mutator, theta_mutator, slot_mutator, slot_mutator);
         end
+        
+        function mutator = get_range(flip_probability)
+            mut = Mutators.get_range_flipper(flip_probability, 8);
+            mutator = MutatorFactory.get_generic(mut, mut, mut, mut, mut);
+        end
     end    
 end
 

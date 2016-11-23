@@ -16,4 +16,5 @@ select =  SelectCandidateFactory.get_generic(Selectors.get_uniform());
 % a merger
 merger = MergeFactory.get_generic(Merges.get_naiverandommerge());
 
-gen = GeneticAlgorithm(10, 100, 0.1,0.5, fit, select, merger, rational);
+gen = GeneticAlgorithm(10, 1, 0.1,0.5, fit, select, merger, rational);
+gen.main();

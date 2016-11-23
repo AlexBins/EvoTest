@@ -5,7 +5,7 @@ classdef FitnesFactory
     methods(Static)
         function fitnes_func = get_simple(good_fitnes_limit)
             function fitnes = fit(chr)
-                scenario = StaticScenario(chr.carx, chr.cary, chr.carangle, chr.slotlength, chr.slotdepth);
+                scenario = chr.get_scenario();
                 [min_distance collision] = scenario.RunParkingPilot();
                 if collision
                     penalty = 0;
