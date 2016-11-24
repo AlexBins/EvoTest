@@ -44,20 +44,44 @@ classdef Car < RectangularElement
             if abs(steering_angle) > self.maxSteeringAngle
                 throw(MException('Car:moveAngleToBig','Please provide another steering angle'));
             end
-            % get the current state that has to be modified
-            % in order to apply a simple matrix multiplication
-            state = [self.GetX(); self.GetY(); self.GetOrientationRadians()];
-                    
-            % generate control matrix:
-            % position is moved by velocity in a certain direction (x,y)
-            % orientation is changed according to the steering_angle and
-            % the axis offset and the velocity
-            control = [cos(state(3))*dt; sin(state(3))*dt; dt*tan(steering_angle)/self.Width];
-            new_state = state  + control * velocity;
+            % Get the orientation before
+            orientation_before = self.GetOrientationRadians();
+            % Calculate the orientation offset
+            orientation_control = tan(steering_angle) / self.Width;
+            % Calculate the orientation afterwards
+            orientation_after = orientation_before + orientation_control * velocity * dt;
             
-            % apply the new state vector to the car
-            self.SetLocation(new_state(1), new_state(2));
-            self.SetOrientationAngle(new_state(3));
+            % Calculate the average to get a better approximation of the
+            % location
+            orientation_avg = (orientation_after + orientation_before) / 2;
+            % Get the location before
+            location_before = [self.GetX(); self.GetY()];
+            % Calculate the offset direction
+            location_control = [cos(orientation_avg); sin(orientation_avg)];
+            % Calculate the location afterwards
+            location_after = location_before + location_control * velocity * dt;
+            
+            % Set the values accordingly
+            self.SetLocation(location_after(1), location_after(2));
+            self.SetOrientationAngle(orientation_after);
+
+            % Deprecated due to a minor bug. Implementation above splits
+            % the following into seperate orientation and location
+            % calculation and uses the average orientation for the latter
+%             % get the current state that has to be modified
+%             % in order to apply a simple matrix multiplication
+%             state = [self.GetX(); self.GetY(); self.GetOrientationRadians()];
+%                     
+%             % generate control matrix:
+%             % position is moved by velocity in a certain direction (x,y)
+%             % orientation is changed according to the steering_angle and
+%             % the axis offset and the velocity
+%             control = [cos(state(3))*dt; sin(state(3))*dt; dt*tan(steering_angle)/self.Width];
+%             new_state = state  + control * velocity;
+%             
+%             % apply the new state vector to the car
+%             self.SetLocation(new_state(1), new_state(2));
+%             self.SetOrientationAngle(new_state(3));
         end
     end
     

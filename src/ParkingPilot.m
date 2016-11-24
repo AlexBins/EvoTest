@@ -6,7 +6,7 @@ classdef ParkingPilot < handle
     end
     
     methods (Static)
-        function [isDirectParkingPossibly, geometricSequence, dubinTarget, dubinOrientation] =...
+        function [isDirectParkingPossible, geometricSequence, dubinTarget, dubinOrientation] =...
                 tryDirectParking(carX, carY, carOrientation, targetX, targetY, targetOrientation, topofslot, minRadius, targetLeftOfSlot)
             %debug = true;
             debug = false;
@@ -69,65 +69,69 @@ classdef ParkingPilot < handle
             % completly. Thus after that, there is an iterative algorithm
             % looking for the actual point since the analytic approach is
             % too complicated
-            cartotargetcircle = circtarget - carl;
-            closestpointontargetcircle = carl + cartotargetcircle - cartotargetcircle / norm(cartotargetcircle) * radtarget;
-            orthogonaldirectionp = cross([cartotargetcircle; 0], upordown);
-            orthogonaldirection = [orthogonaldirectionp(1); orthogonaldirectionp(2)];
-            orthogonalstart = (closestpointontargetcircle + carl) / 2;
-            orthogonalline = cross(PointToProj(orthogonalstart), PointToProj(orthogonalstart + orthogonaldirection));
-            carline = cross(PointToProj(carl), PointToProj(carl + carn));
-            circcarp = cross(carline, orthogonalline);
-            
-            if debug
-                plot([carl(1) circtarget(1)], [carl(2) circtarget(2)], 'b:');
-                plot(closestpointontargetcircle(1), closestpointontargetcircle(2), 'bx');
-                quiver(orthogonalstart(1), orthogonalstart(2), orthogonaldirection(1) / norm(orthogonaldirection), orthogonaldirection(2) / norm(orthogonaldirection), 'Color', 'b');
-            end
-            
-            
-            % transform the point from projective geometry to normal
-            % 2D geometry
-            circcar = PointFromProj(circcarp);
-            
-            if debug
-                plot(circcar(1), circcar(2), 'rx');
-            end
-            
-            % iterative enhancement
-            vectocross = circcar - carl;
-            lambda = norm(vectocross) / norm(carn);
-            % If the intersection lies "behind" the car location
-            % (perspective: looking in carn direction)
-            if sign(vectocross(1)) == sign(carn(1))
-                [tmpx, tmpy, tmpr] = getCircle(circtarget(1), circtarget(2), radtarget,...
-                    carl(1), carl(2), carn(1), carn(2), lambda);
-                circcar = [tmpx; tmpy];
-                radcar = tmpr;
+            if norm(circtarget - carl) > minRadius
+                cartotargetcircle = circtarget - carl;
+                closestpointontargetcircle = carl + cartotargetcircle - cartotargetcircle / norm(cartotargetcircle) * radtarget;
+                orthogonaldirectionp = cross([cartotargetcircle; 0], upordown);
+                orthogonaldirection = [orthogonaldirectionp(1); orthogonaldirectionp(2)];
+                orthogonalstart = (closestpointontargetcircle + carl) / 2;
+                orthogonalline = cross(PointToProj(orthogonalstart), PointToProj(orthogonalstart + orthogonaldirection));
+                carline = cross(PointToProj(carl), PointToProj(carl + carn));
+                circcarp = cross(carline, orthogonalline);
 
                 if debug
-                    plot(circcar(1), circcar(2), 'bx');
-                    viscircles([circcar(1) circcar(2)], radcar, 'Color', 'b');
+                    plot([carl(1) circtarget(1)], [carl(2) circtarget(2)], 'b:');
+                    plot(closestpointontargetcircle(1), closestpointontargetcircle(2), 'bx');
+                    quiver(orthogonalstart(1), orthogonalstart(2), orthogonaldirection(1) / norm(orthogonaldirection), orthogonaldirection(2) / norm(orthogonaldirection), 'Color', 'b');
                 end
-                % the radius of the turning circle at the car is the distance
-                % between the target circle center and the car circle center
-                % minus the target circle radius
-                %radcar = norm(circcar - carl);
 
-                % directparking is only possible if the radius is at least the
-                % minimum turning circle's radius
-                if radcar < minRadius
-                    isDirectParkingPossibly = false;
+
+                % transform the point from projective geometry to normal
+                % 2D geometry
+                circcar = PointFromProj(circcarp);
+
+                if debug
+                    plot(circcar(1), circcar(2), 'rx');
+                end
+
+                % iterative enhancement
+                vectocross = circcar - carl;
+                lambda = norm(vectocross) / norm(carn);
+                % If the intersection lies "behind" the car location
+                % (perspective: looking in carn direction)
+                if sign(vectocross(1)) == sign(carn(1))
+                    [tmpx, tmpy, tmpr] = getCircle(circtarget(1), circtarget(2), radtarget,...
+                        carl(1), carl(2), carn(1), carn(2), lambda);
+                    circcar = [tmpx; tmpy];
+                    radcar = tmpr;
+
+                    if debug
+                        plot(circcar(1), circcar(2), 'bx');
+                        viscircles([circcar(1) circcar(2)], radcar, 'Color', 'b');
+                    end
+                    % the radius of the turning circle at the car is the distance
+                    % between the target circle center and the car circle center
+                    % minus the target circle radius
+                    %radcar = norm(circcar - carl);
+
+                    % directparking is only possible if the radius is at least the
+                    % minimum turning circle's radius
+                    if radcar < minRadius
+                        isDirectParkingPossible = false;
+                    else
+                        isDirectParkingPossible = true;
+                    end
                 else
-                    isDirectParkingPossibly = true;
+                    isDirectParkingPossible = false;
                 end
             else
-                isDirectParkingPossibly = false;
+                isDirectParkingPossible = false;
             end
             
             % if direct parking is possible, add the circle definitions to
             % the geometric sequence, else calculate the dubin's car target
             % location and direction
-            if isDirectParkingPossibly
+            if isDirectParkingPossible
                 
                 ParkingPilot.fillWithElements(geometricSequence,...
                     carl, carn, targetl, targetn,...

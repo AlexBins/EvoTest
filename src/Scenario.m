@@ -91,6 +91,7 @@ classdef Scenario < handle
                 end
             end
             
+            
         end
         
         function DriveCircle(self, velocity, steering_angle, duration, dt)

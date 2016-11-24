@@ -1,5 +1,6 @@
 % a mutator with
 % every bit flips with a probability of 10%
+close all;
 rational = MutatorFactory.get_range(0.1);
 
 % a fitnes function
@@ -13,7 +14,7 @@ select =  SelectCandidateFactory.get_generic(Selectors.get_uniform());
 merger = MergeFactory.get_generic(Merges.get_naiverandommerge());
 
 gen = GeneticAlgorithm(10, 1, 0.5, fit, select, merger, rational);
-gen.main(100);
+gen.main(50);
 sc = gen.Population(1).get_scenario();
 sc.RunParkingPilot();
-sc.Replay(1/60, 1);
+sc.Replay(0.04, 3);

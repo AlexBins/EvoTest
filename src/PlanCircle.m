@@ -53,8 +53,8 @@ classdef PlanCircle < PlanObject
             % 
             % numeric: s = f * d since s = +1 = left s= -1 = right
             
-            steer = sign(self.Direction) * sign(self.Forward);
-            steering_angle = atan(axisDistance/self.Radius) * steer;
+            steering_direction = sign(self.Direction) * sign(self.Forward);
+            steering_angle = atan(axisDistance/self.Radius) * steering_direction;
             distance = dAngle*self.Radius;
             duration = abs(distance / velocity);
             v = velocity * sign(self.Forward);
