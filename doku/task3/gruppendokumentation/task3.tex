@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[german]{babel}
 \usepackage[T1]{fontenc}
+\usepackage{amsmath}
 
 \title{Evolutionärer Algorithmus -- EvoTest}
 \author{Yaroslax, Alexander, Manuel}
@@ -74,13 +75,40 @@ Durch die generische Auslegung der Mutation im Rahmen des genetischen Algorithmu
 
 \subsection{Rekombination}
 % Wer hat die Rekombination gemacht?
-
+Die Rekombination führt den Crossover Teil des Genetischen Algorithmus aus. Er erstellt ein neues Chromosom wobei er für jeden einzelnen Wert entscheidet, welchem der gegebenen zwei Chromosome er diesen Wert entnimmt.\\
+Die Schnittstelle für die Rekombination ist folgendermaßen definiert: 
+\begin{quote}
+	\textsf{merge: (chromosome, chromosome) $\rightarrow$ chromosome}
+\end{quote}
+\paragraph{Probleme} Die Rekombination wählt jeden Wert unabhängig von der Wahl der anderen Werte aus. Daraus kann sich das Szenario ergeben, dass die X-Position des neuen Chromosoms nicht vom gleichen Chromosom kommt, wie die Y-Koordinate. Hieraus folgt dasselbe Problem wie bei der Mutation, dass semantisch ähnliche Variablen vollständig unabhängig voneinander gesetzt werden. Auch hierfür kann man bei Bedarf die Modularität des Systems ausnutzen und eine erweiterte Crossover Funktion erstellen. Zur Zeit erweist sich die hier gewählte Funkion aber als den Anforderungen genügend.
 \subsection{Fitness}
 % Manuel, evntl Alex nach Verbesserung?
 % Wir sollten den Verbesserungsprozess beschreiben, evntl ein paar Effekte der Primärversion
-Die Fitness dient als Grundlage für den Selektionsprozess. In erster Instanz wurde die Fitnessfunktion als umgekehrt Proportional zum minimalen Abstand realisiert: \[Fitness = \frac{1}{minDist + maxValue^{-1}}\]
-Die Skalierung mit $maxValue^{-1}$ legt den Maximalwert im Kollisionsfall fest und definiert damit die obere Schranke für die Fitnessfunktion. Der minimale Abstand wird aus der Simulation ermittelt.
+Die Fitness dient als Grundlage für den Selektionsprozess. Sie erstellt aus einem Chromosom eine Simulation und wertet diese entsprechend ihrer Implementierung aus.\\
+Das Fitnessfunktion genügt der Signatur
+\begin{quote}
+	\textsf{fitness: chromosome $\rightarrow$ number}
+\end{quote}
+\begin{enumerate}
+	\item In erster Instanz wurde die Fitnessfunktion als umgekehrt proportional zum minimalen Abstand realisiert.
+	\paragraph{Implementierung}
+	\[Fitness = \frac{1}{minDist + maxValue^{-1}}\]
+Die Skalierung mit $maxValue^{-1}$ legt den Maximalwert im Kollisionsfall fest und definiert damit die obere Schranke für die Fitnessfunktion. Der minimale Abstand wird in der Simulation ermittelt.
+\paragraph{Probleme} Diese Wahl der Fitnessfunktion führt dazu, dass ein Testfall auch als besonders gut eingestuft wird, wenn er mit Heck direkt an einem Hindernis beginnt und danach eigentlich einen sehr simplen Einparkvorgang durchführt.\\
+Außerdem werden hier alle Werte $\ge$ 0 als sehr gut eingestuft, solange sie nur möglichst klein sind. Das ist natürlich nicht realitätsgetreu, da Werte der Größenordnung $10^-5$ bereits durch minimale Störeinwirkungen wie zum Beispiel starker Wind bereits zu einem Unfall führen können.
+	\item Als Alternative wurde eine Fitnessfunktion definiert, die es ermöglicht einen bestimmten minimalen Abstand zu bevorzugen. Hierbei wurde darauf geachtet, dass für Werte kleiner als der gewünschte Abstand die Fitnessfunktion einen "schlechteren" Wert berechnet, als für den gewünschten Abstand und Abstände, welche nahezu gleich 0 sind, möglichst schlecht darzustellen. Für Abstände größer oder gleich dem gwünschntem Abstand wurde der gleiche Ansatz wie in Variante 1 gewählt.\\
+	\paragraph{Implementierung}
+	\begin{equation}
+	Fitness = 
+	\begin{cases}
+		\frac{minDist}{desiredDist}^4 & \text{für } minDist < desiredDist \\
+		\frac{desiredDist}{minDist} & \text{sonst}
+	\end{cases}
+	\end{equation}
+	Im ersten Fall wird mit dem Exponenten 4 bewirkt, dass die Bestrafung für Abweichungen von der erwünschten Distanz wesentlich härter bestraft werden, wenn sie Richtung 0 gehen, als wenn sie Richtung $\infty$ gehen. Dies bewirkt, dass man sich bei der Wahl der erwünschten minimalen Distanz wesentlich zielstrebiger und mutiger verhalten kann, da sie eher über- als unterschritten wird.
+	\paragraph{Probleme} Auch wenn nun Werte der Größenordnung $10^{-5}$ nicht mehr als sehr gut angesehen werden (sofern man das nicht explizit erreichen will), können immer noch Testfälle generiert werden, die mit optimalem Abstand beginnen und danach trivial ablaufen.
+\end{enumerate} 
 
 \subsection{Selektion}
-% Alex?
+% 
 \end{document}

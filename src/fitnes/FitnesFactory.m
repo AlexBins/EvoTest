@@ -34,7 +34,7 @@ classdef FitnesFactory
                     d = (min_distance / desired_mindistance)^4;
                 else
                     % The larger the distance, the worse the value
-                    d = 1 - (min_distance - desired_mindistance) / min_distance;
+                    d = desired_mindistance / min_distance;
                 end
                 % d is NaN if min_distance and the desired distance are
                 % equal to zero => collision => bad
