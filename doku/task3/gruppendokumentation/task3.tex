@@ -26,8 +26,8 @@ Chromosome\\
 carx \\
 cary\\
 carangle\\
-slotpength\\
-slotsdepth\\
+slotlength\\
+slotdepth\\
 \hline
 \end{tabular}
 \caption{Bestandteile eines Chromosoms}
@@ -64,13 +64,22 @@ Die Operatoren, die im genetischen Algorithmus angewendet werden, sind modular t
 
 \subsection{Mutation}
 % Manuel
+Die Mutation genügt der Signatur
+\begin{quote}
+ \textsf{mutate: chromosome $\rightarrow$ chromosome}
+\end{quote}
+Durch die generische Auslegung der Mutation im Rahmen des genetischen Algorithmus ist ein Austausch jederzeit möglich. Für den aktuellen Stand wurde ein Algorithmus entwickelt, der das Genom als Integer interpretiert und in dessen Binärdarstellung -- als String -- umwandelt. Dieser String wird iterativ verarbeitet. Dabei wird jedes Bit mit einer zuvor definierten Wahrscheinlichkeit umgekehrt.
+
+\paragraph{Probleme} Die Mutation erfolgt mit einer identischen Wahrscheinlichkeit für hoch- und niederwertige Bits. Dies kann von Vorteil sein, um randomisiert auch große Sprünge zu erlauben. Allerdings können somit auch vielversprechende Kandidaten stark verändert werden. Es kann also eventuell Notwendig sein, Spezialformen der Bit-Mutation zu integrieren. Das modulare System bietet hierfür hervorragende Skalierungsmöglichkeiten.
 
 \subsection{Rekombination}
 % Wer hat die Rekombination gemacht?
 
-\subsection{Fitnes}
+\subsection{Fitness}
 % Manuel, evntl Alex nach Verbesserung?
 % Wir sollten den Verbesserungsprozess beschreiben, evntl ein paar Effekte der Primärversion
+Die Fitness dient als Grundlage für den Selektionsprozess. In erster Instanz wurde die Fitnessfunktion als umgekehrt Proportional zum minimalen Abstand realisiert: \[Fitness = \frac{1}{minDist + maxValue^{-1}}\]
+Die Skalierung mit $maxValue^{-1}$ legt den Maximalwert im Kollisionsfall fest und definiert damit die obere Schranke für die Fitnessfunktion. Der minimale Abstand wird aus der Simulation ermittelt.
 
 \subsection{Selektion}
 % Alex?
