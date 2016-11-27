@@ -3,6 +3,10 @@
 \usepackage[german]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{subcaption}
 
 \title{Evolutionärer Algorithmus -- EvoTest}
 \author{Yaroslax, Alexander, Manuel}
@@ -13,12 +17,29 @@ Der genetische Algorithmus dient zur iterativen Optimierung der Testfälle. Er e
 
 \subsection{Architektur}
 % Alex, evntl UML, umsetzung, etc
+Der Genetische Algorithmus wird als eine Klasse implementiert (s. Abbildung \ref{fig:ga_uml}).\\
+In der Mutation- und ReproductionRate wird festgelegt, wie stark ein Chromosom mutieren soll oder wie viele neue Chromosome der Population pro Epoche hinzugefügt werden, bevor die Population wieder auf Soll-Größe schrumpft.\\
+Da die Implementierung der einzelnen Schritte auf Modularität ausgelegt ist (s. Absatz \ref{sec:op}), werden einige der Funktionen als Eigenschaften gesehen, da sie modular austauschbar sind.\\
+Die Ausführung des Genetischen Algorithmus findet in der main Methode statt (s. Abbildung \ref{fig:ga_flow}). Diese akzeptiert unter Umständen noch Parameter, welche zur Berechnung des Abbruchkriteriums genutzt werden. Aktuell bricht der genetische Algorithmus stets nach einer übergebenen Anzahl Epochen ab. Dies kann aber angepasst werden, falls es im weiteren Verlauf des Praktikums noch vonnöten wäre.
+\begin{figure}[H]
+\centering
+\includegraphics[width=.5\textwidth]{images/GA_UML}%
+\caption{Klassenkarte des Genetischen Algorithmus}%
+\label{fig:ga_uml}%
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=.75\textwidth]{images/GA_FlowChart}
+\caption{Ablauf des genetischen Algorithmus}
+\label{fig:ga_flow}
+\end{figure}
 
 \subsection{Chromosome}
 % Parameterisierung (Prozent der Range)
 % Manuel
 Chromosome dienen der Persistierung der Testfall-Konfigurationen. Sie enthalten die Bestandteile eines realen Testfalls -- so wie er für die Simulation benutzt wird -- in einer für den Genetischen Algorithmus geeigneten Kodierung. Abbildung \ref{fig:chromosome} bietet einen Überblick über die Bestandteile.
-\begin{figure}[hb]
+\begin{figure}[H]
 \centering
 \begin{tabular}{|l|}
 \hline
@@ -35,7 +56,7 @@ slotdepth\\
 \label{fig:chromosome}
 \end{figure}
 Die Information in den Chromosomen sind als prozentualer Anteil eines Wertebereichs kodiert. Die Unterteilung der Wertebereiche erfolgt durch eine 8-Bit Diskretisierung, somit entsprechen 0\% dem Wert 0 und 100\% dem Wert 255. Tabelle \ref{tab:ranges} stellt die tatsächliche Verteilung der Werte dar. 
-\begin{figure}[hb]
+\begin{table}[H]
 \centering
 \begin{tabular}{l|c|c}
 Wert & Minimum & Maximum \\\hline
@@ -47,14 +68,14 @@ Slot-Breite & 1 & 2 \\
 \end{tabular}
 \caption{Wertebereiche der Chromosom-Bestandteile}
 \label{tab:ranges}
-\end{figure}
+\end{table}
 Die Chromosomen werden in Matlab in einer eigenen Klasse abgelegt. Sie speichert die zugewiesenen prozentualen Anteile an der Gesamt-Range sowie die zugeordnete Fitness. Zudem wird eine Funktion angeboten, die die Berechnung des durch das Chromosom repräsentierten Szenarios -- und somit das Mapping auf die spezifizierten Wertebereiche -- vornimmt.
 
 
-\subsection{Austauschbare Operatoren}
+\subsection{Austauschbare Operatoren}\label{sec:op}
 % Faktory-Pattern, Einbindung in gen GA
 % Manuel, Alex
-Um eine skalierende Lösung vorzuhalten -- insbesondere im Hinblick auf Erweiterungen und Optimierungen -- wurden die Teil-Implementierungen des Evolutionsprozesses austauschbar realisiert. Sie werden als \emph{Funktion-Handle} im Evolutionsframework verankert und können zu Beginn oder nach einer gewissen Epoche durch eine Funktion mit äquivalenter Signatur getauscht werden. So ist es Beispielsweise möglich, Anfangs nach vielversprechenden Bereichen zu suchen, um im späteren Verlauf eine lokale Optimierung durchzuführen.
+Um eine skalierende Lösung vorzuhalten -- insbesondere im Hinblick auf Erweiterungen und Optimierungen -- wurden die Teil-Implementierungen des Evolutionsprozesses austauschbar realisiert. Sie werden als \emph{Function-Handle} im Evolutionsframework verankert und können zu Beginn oder nach einer gewissen Epoche durch eine Funktion mit äquivalenter Signatur getauscht werden. So ist es Beispielsweise möglich, Anfangs nach vielversprechenden Bereichen zu suchen, um im späteren Verlauf eine lokale Optimierung durchzuführen.
 
 \paragraph{Operatoren Erzeugung} Die Operatoren werden durch das \emph{Factory-Pattern} generiert. Dabei wird eine Fabrik-Funktion verwendet um die Operation gegebenenfalls zu konditionieren. Sie liefert als Resultat die fertige Operation, die in den genetischen Algorithmus eingebunden werden kann.
 
