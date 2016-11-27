@@ -8,21 +8,57 @@
 
 \begin{document}
 \section{Genetischer Algorithmus}
-Der genetische Algorithmus dient zur iterativen Optimierung der Testfälle. Er erzeugt eine Anzahl Cromosome, die über mehrere Stufen durch diverse Operationen verbessert werden.
+Der genetische Algorithmus dient zur iterativen Optimierung der Testfälle. Er erzeugt eine Anzahl Chromosome, die über mehrere Stufen durch diverse Operationen verbessert werden.
 
-\subsection{Allgemeines}
+\subsection{Architektur}
 % Alex, evntl UML, umsetzung, etc
 
-\subsection{Chromsome}
+\subsection{Chromosome}
 % Parameterisierung (Prozent der Range)
 % Manuel
+Chromosome dienen der Persistierung der Testfall-Konfigurationen. Sie enthalten die Bestandteile eines realen Testfalls -- so wie er für die Simulation benutzt wird -- in einer für den Genetischen Algorithmus geeigneten Kodierung. Abbildung \ref{fig:chromosome} bietet einen Überblick über die Bestandteile.
+\begin{figure}[hb]
+\centering
+\begin{tabular}{|l|}
+\hline
+Chromosome\\
+\hline
+carx \\
+cary\\
+carangle\\
+slotpength\\
+slotsdepth\\
+\hline
+\end{tabular}
+\caption{Bestandteile eines Chromosoms}
+\label{fig:chromosome}
+\end{figure}
+Die Information in den Chromosomen sind als prozentualer Anteil eines Wertebereichs kodiert. Die Unterteilung der Wertebereiche erfolgt durch eine 8-Bit Diskretisierung, somit entsprechen 0\% dem Wert 0 und 100\% dem Wert 255. Tabelle \ref{tab:ranges} stellt die tatsächliche Verteilung der Werte dar. 
+\begin{figure}[hb]
+\centering
+\begin{tabular}{l|c|c}
+Wert & Minimum & Maximum \\\hline
+Fahrzeug X-Koordinate & -7.5 & +7.5 \\
+Fahrzeug Y-Koordinate & -1 & +4 \\
+Fahrzeug Orientierung & 0 & $2\,\pi$\\
+Slot-Länge & 2.25 & 5 \\
+Slot-Breite & 1 & 2 \\
+\end{tabular}
+\caption{Wertebereiche der Chromosom-Bestandteile}
+\label{tab:ranges}
+\end{figure}
+Die Chromosomen werden in Matlab in einer eigenen Klasse abgelegt. Sie speichert die zugewiesenen prozentualen Anteile an der Gesamt-Range sowie die zugeordnete Fitness. Zudem wird eine Funktion angeboten, die die Berechnung des durch das Chromosom repräsentierten Szenarios -- und somit das Mapping auf die spezifizierten Wertebereiche -- vornimmt.
+
 
 \subsection{Austauschbare Operatoren}
 % Faktory-Pattern, Einbindung in gen GA
 % Manuel, Alex
+Um eine skalierende Lösung vorzuhalten -- insbesondere im Hinblick auf Erweiterungen und Optimierungen -- wurden die Teil-Implementierungen des Evolutionsprozesses austauschbar realisiert. Sie werden als \emph{Funktion-Handle} im Evolutionsframework verankert und können zu Beginn oder nach einer gewissen Epoche durch eine Funktion mit äquivalenter Signatur getauscht werden. So ist es Beispielsweise möglich, Anfangs nach vielversprechenden Bereichen zu suchen, um im späteren Verlauf eine lokale Optimierung durchzuführen.
+
+\paragraph{Operatoren Erzeugung} Die Operatoren werden durch das \emph{Factory-Pattern} generiert. Dabei wird eine Fabrik-Funktion verwendet um die Operation gegebenenfalls zu konditionieren. Sie liefert als Resultat die fertige Operation, die in den genetischen Algorithmus eingebunden werden kann.
 
 \section{Operatoren}
-Die Operatoren, die im genetischen Algorithmus Anwendung finden, sind modular tauschbar. Sie müssen lediglich die Schnittstellendefinition einhalten.
+Die Operatoren, die im genetischen Algorithmus angewendet werden, sind modular tauschbar. Sie müssen lediglich die Schnittstellendefinition einhalten.
 \subsection{Initialisierung}
 % Yaroslav
 
