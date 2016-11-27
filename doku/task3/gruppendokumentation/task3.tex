@@ -60,34 +60,62 @@ Um eine skalierende Lösung vorzuhalten -- insbesondere im Hinblick auf Erweiter
 
 \section{Operatoren}
 Die Operatoren, die im genetischen Algorithmus angewendet werden, sind modular tauschbar. Sie müssen lediglich die Schnittstellendefinition einhalten.
+
+% BEGIN Init
 \subsection{Initialisierung}
-% Yaroslav
+\paragraph{Erklärung}
+% TODO: Yaroslav
 
-\subsection{Mutation}
-% Manuel
-Die Mutation genügt der Signatur
+% Unter Umständen müssen folgende Paragraphen auch ausgefüllt werden
+\paragraph{Implementierung}
+\paragraph{Probleme}
+% END Init
+
+% BEGIN Selektion
+\subsection{Selektion}
+\paragraph{Erklärung}
+Die Selektion wählt die Chromosome aus der aktuellen Population aus, aus welchen man neue Chromosome generieren wird. Auch hier wird Modularität ermöglicht, obwohl es einen Standardansatz gibt. Die Schnittstelle hierfür ist folgendermaßen definiert:
 \begin{quote}
- \textsf{mutate: chromosome $\rightarrow$ chromosome}
+ \textsf{Select: array(chromosom) $\rightarrow$ chromosome}
 \end{quote}
-Durch die generische Auslegung der Mutation im Rahmen des genetischen Algorithmus ist ein Austausch jederzeit möglich. Für den aktuellen Stand wurde ein Algorithmus entwickelt, der das Genom als Integer interpretiert und in dessen Binärdarstellung -- als String -- umwandelt. Dieser String wird iterativ verarbeitet. Dabei wird jedes Bit mit einer zuvor definierten Wahrscheinlichkeit umgekehrt.
+\begin{enumerate}
+	\item Die effizienteste und in vielen Fällen sogar ausreichende Selektionsfunktion wählt mit gleichverteilter Wahrscheinlichkeit ein Chromosom $x$ aus der Population $ppl$ aus $$p(x) ~=~ \frac{1}{|ppl|}$$ wobei $|ppl|$ die Menge an Elementen der Population ist.
+	\item Die dem Standard entsprechende Funktion wählt ein Chromosom $x$ der Population $ppl$ mit Wahrscheinlichkeit $$p(x)~=~\frac{Fitness(x)}{\sum_{c ~\in~ ppl}^{}{Fitness(c)}}$$
+\end{enumerate}
+% END Selektion
 
-\paragraph{Probleme} Die Mutation erfolgt mit einer identischen Wahrscheinlichkeit für hoch- und niederwertige Bits. Dies kann von Vorteil sein, um randomisiert auch große Sprünge zu erlauben. Allerdings können somit auch vielversprechende Kandidaten stark verändert werden. Es kann also eventuell Notwendig sein, Spezialformen der Bit-Mutation zu integrieren. Das modulare System bietet hierfür hervorragende Skalierungsmöglichkeiten.
-
+% BEGIN Rekombination
 \subsection{Rekombination}
-% Wer hat die Rekombination gemacht?
+\paragraph{Erklärung}
 Die Rekombination führt den Crossover Teil des Genetischen Algorithmus aus. Er erstellt ein neues Chromosom wobei er für jeden einzelnen Wert entscheidet, welchem der gegebenen zwei Chromosome er diesen Wert entnimmt.\\
 Die Schnittstelle für die Rekombination ist folgendermaßen definiert: 
 \begin{quote}
 	\textsf{merge: (chromosome, chromosome) $\rightarrow$ chromosome}
 \end{quote}
 \paragraph{Probleme} Die Rekombination wählt jeden Wert unabhängig von der Wahl der anderen Werte aus. Daraus kann sich das Szenario ergeben, dass die X-Position des neuen Chromosoms nicht vom gleichen Chromosom kommt, wie die Y-Koordinate. Hieraus folgt dasselbe Problem wie bei der Mutation, dass semantisch ähnliche Variablen vollständig unabhängig voneinander gesetzt werden. Auch hierfür kann man bei Bedarf die Modularität des Systems ausnutzen und eine erweiterte Crossover Funktion erstellen. Zur Zeit erweist sich die hier gewählte Funkion aber als den Anforderungen genügend.
+% END Rekombination
+
+% BEGIN Mutation
+\subsection{Mutation}
+% Manuel
+\paragraph{Erklärung}
+Die Mutation genügt der Signatur
+\begin{quote}
+ \textsf{mutate: chromosome $\rightarrow$ chromosome}
+\end{quote}
+Durch die generische Auslegung der Mutation im Rahmen des genetischen Algorithmus ist ein Austausch jederzeit möglich. Für den aktuellen Stand wurde ein Algorithmus entwickelt, der das Genom als Integer interpretiert und in dessen Binärdarstellung -- als String -- umwandelt. Dieser String wird iterativ verarbeitet. Dabei wird jedes Bit mit einer zuvor definierten Wahrscheinlichkeit umgekehrt.
+\paragraph{Probleme} Die Mutation erfolgt mit einer identischen Wahrscheinlichkeit für hoch- und niederwertige Bits. Dies kann von Vorteil sein, um randomisiert auch große Sprünge zu erlauben. Allerdings können somit auch vielversprechende Kandidaten stark verändert werden. Es kann also eventuell Notwendig sein, Spezialformen der Bit-Mutation zu integrieren. Das modulare System bietet hierfür hervorragende Skalierungsmöglichkeiten.
+% END Mutation
+
+% BEGIN Fitness
 \subsection{Fitness}
 % Manuel, evntl Alex nach Verbesserung?
 % Wir sollten den Verbesserungsprozess beschreiben, evntl ein paar Effekte der Primärversion
+\paragraph {Erklärung}
 Die Fitness dient als Grundlage für den Selektionsprozess. Sie erstellt aus einem Chromosom eine Simulation und wertet diese entsprechend ihrer Implementierung aus.\\
 Das Fitnessfunktion genügt der Signatur
 \begin{quote}
-	\textsf{fitness: chromosome $\rightarrow$ number}
+	\textsf{Fitness: chromosome $\rightarrow$ number}
 \end{quote}
 \begin{enumerate}
 	\item In erster Instanz wurde die Fitnessfunktion als umgekehrt proportional zum minimalen Abstand realisiert.
@@ -95,8 +123,8 @@ Das Fitnessfunktion genügt der Signatur
 	\[Fitness = \frac{1}{minDist + maxValue^{-1}}\]
 Die Skalierung mit $maxValue^{-1}$ legt den Maximalwert im Kollisionsfall fest und definiert damit die obere Schranke für die Fitnessfunktion. Der minimale Abstand wird in der Simulation ermittelt.
 \paragraph{Probleme} Diese Wahl der Fitnessfunktion führt dazu, dass ein Testfall auch als besonders gut eingestuft wird, wenn er mit Heck direkt an einem Hindernis beginnt und danach eigentlich einen sehr simplen Einparkvorgang durchführt.\\
-Außerdem werden hier alle Werte $\ge$ 0 als sehr gut eingestuft, solange sie nur möglichst klein sind. Das ist natürlich nicht realitätsgetreu, da Werte der Größenordnung $10^-5$ bereits durch minimale Störeinwirkungen wie zum Beispiel starker Wind bereits zu einem Unfall führen können.
-	\item Als Alternative wurde eine Fitnessfunktion definiert, die es ermöglicht einen bestimmten minimalen Abstand zu bevorzugen. Hierbei wurde darauf geachtet, dass für Werte kleiner als der gewünschte Abstand die Fitnessfunktion einen "schlechteren" Wert berechnet, als für den gewünschten Abstand und Abstände, welche nahezu gleich 0 sind, möglichst schlecht darzustellen. Für Abstände größer oder gleich dem gwünschntem Abstand wurde der gleiche Ansatz wie in Variante 1 gewählt.\\
+Außerdem werden hier alle Werte $\ge$ 0 als sehr gut eingestuft, solange sie nur möglichst klein sind. Das ist natürlich nicht realitätsgetreu, da Werte der Größenordnung $10^{-5}$ bereits durch minimale Störeinwirkungen wie zum Beispiel starker Wind bereits zu einem Unfall führen können.
+	\item Als Alternative wurde eine Fitnessfunktion definiert, die es ermöglicht einen bestimmten minimalen Abstand zu bevorzugen. Hierbei wurde darauf geachtet, dass für Werte kleiner als der gewünschte Abstand die Fitnessfunktion einen \glqq schlechteren\grqq $ $ Wert berechnet, als für den gewünschten Abstand und Abstände, welche nahezu gleich 0 sind, möglichst schlecht darzustellen. Für Abstände größer oder gleich dem gwünschntem Abstand wurde der gleiche Ansatz wie in Variante 1 gewählt.\\
 	\paragraph{Implementierung}
 	\begin{equation}
 	Fitness = 
@@ -108,7 +136,6 @@ Außerdem werden hier alle Werte $\ge$ 0 als sehr gut eingestuft, solange sie nu
 	Im ersten Fall wird mit dem Exponenten 4 bewirkt, dass die Bestrafung für Abweichungen von der erwünschten Distanz wesentlich härter bestraft werden, wenn sie Richtung 0 gehen, als wenn sie Richtung $\infty$ gehen. Dies bewirkt, dass man sich bei der Wahl der erwünschten minimalen Distanz wesentlich zielstrebiger und mutiger verhalten kann, da sie eher über- als unterschritten wird.
 	\paragraph{Probleme} Auch wenn nun Werte der Größenordnung $10^{-5}$ nicht mehr als sehr gut angesehen werden (sofern man das nicht explizit erreichen will), können immer noch Testfälle generiert werden, die mit optimalem Abstand beginnen und danach trivial ablaufen.
 \end{enumerate} 
+% END Fitness
 
-\subsection{Selektion}
-% 
 \end{document}
