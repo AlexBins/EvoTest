@@ -39,7 +39,7 @@ classdef FitnesFactory
                 
                 [x, y, ~, ~, ~] = chr.get_physical_data();
                 start = [x; y];
-                dist = norm(target - start);
+                dist = norm((target - start) * 0.1);
                 fitnes = 1 / (1 + dist);
             end
             fitness_func = @fit;
