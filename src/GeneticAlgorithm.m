@@ -55,8 +55,8 @@ classdef GeneticAlgorithm < handle
             
         end
         function main(self, max_epoch, varargin)
-            if length(varargin) >= 1 && varargin{1}
-                prnt = @(x) fprintf([x '\n']);
+            if length(varargin) >= 1 && varargin{1}  
+                prnt = @Utility.print;
             else
                 prnt = @Utility.DoNothing;
             end
@@ -69,14 +69,14 @@ classdef GeneticAlgorithm < handle
             end
             % Initialize the population
             
-            prnt('Init\n');
+            prnt('Init');
             start_time();
             self.Initialize();
             end_time()
             
             MaxEpoch = max_epoch;
             
-            prnt('First fitness calculation\n');
+            prnt('First fitness calculation');
             start_time();
             % Calculate each candidate's fitness
             for i = 1:self.PopulationSize
@@ -94,10 +94,10 @@ classdef GeneticAlgorithm < handle
             
             % Enter the epoch loop
             while true
-                prnt('starting epoch %d\n', self.Epoch);
+                prnt('starting epoch:', self.Epoch);
                 self.Epoch = self.Epoch + 1;
                 % Select, merge, mutate and add
-                prnt('creating %d new candidates\n', nNewCandidatesPerEpoch);
+                prnt('creating', nNewCandidatesPerEpoch, 'new candidates');
                 start_time();
                 for i = 1:nNewCandidatesPerEpoch
                     parent1 = self.SelectCandidateFunction(self.Population);
