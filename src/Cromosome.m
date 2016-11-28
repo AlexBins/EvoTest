@@ -22,7 +22,7 @@ classdef Cromosome < handle
         end
         
         function [x, y, angle, length, depth] = get_physical_data(self)
-            bit_max = 255;
+            bit_max = Cromosome.get_max_value();
             x = 15*self.carx/bit_max - 7.5;
             y = 5*self.cary/bit_max - 1;
             angle = 360*self.carangle/bit_max;
@@ -43,6 +43,10 @@ classdef Cromosome < handle
     methods (Static)
         function cromosome = get_random()
             cromosome = Cromosome(rand, rand, rand, rand, rand);
+        end
+        
+        function val = get_max_value()
+            val = 255;
         end
     end
 end

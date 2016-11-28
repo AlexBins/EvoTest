@@ -1,7 +1,7 @@
 classdef Element < handle
     %ELEMENT Interface for an element in the current scenario
     %   
-    properties (Access = private)
+    properties
         Location
         OrientationAngle
     end

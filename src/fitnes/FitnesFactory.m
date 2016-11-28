@@ -17,6 +17,43 @@ classdef FitnesFactory
             fitnes_func = @fit;
         end
         
+        function fitness_func = get_combined(varargin)
+            if isempty(varargin)
+                fitness_func = FitnesFactory.get_simple(1);
+                return;
+            end
+            
+            function fitness = fit(chr)
+                fitness = 1;
+                for i = 1:length(varargin)
+                    f = varargin{i};
+                    fitness = fitness * f(chr);
+                end
+            end
+            fitness_func = @fit;
+        end
+        
+        function fitness_func = get_min_distance_start()
+            function fitnes = fit(chr)
+                target = [0; -1.5];
+                
+                [x, y, ~, ~, ~] = chr.get_physical_data();
+                start = [x; y];
+                dist = norm(target - start);
+                fitnes = 1 / (1 + dist);
+            end
+            fitness_func = @fit;
+        end
+        
+        function fitnes_func = get_min_parking_slot()
+            function fitnes = fit(chr)
+                [~, ~, ~, l, d] = chr.get_physical_data();
+                fitnes = 1 / (l + d);
+                fitnes = fitnes ^ 2;
+            end
+            fitnes_func = @fit;
+        end
+        
         function fitnes_func = get_desired_mindistance(good_fitness_limit, desired_mindistance)
             % Generates a fitness function, that is best if the given
             % minimum distance is reached

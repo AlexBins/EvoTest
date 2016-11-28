@@ -122,18 +122,24 @@ classdef GeneticAlgorithm < handle
         function Initialize(self)
             % TODO: implement restrictions to ensure scenario plausibility
             N = self.PopulationSize;
-            xy_max = 10;
-            xy_min = 0;
-            length_max = 10;
-            length_min = 1;
-            depth_max = 10;
-            depth_min = 1;
-            t = Cromosome.empty;
-            for i = 1:10
-            %self.Population(i) 
-            t(i) = Cromosome(randi([xy_min xy_max],1,1), randi([xy_min xy_max],1,1), (0 + (2*pi-0).*rand()), randi([length_min length_max],1,1), randi([depth_min depth_max],1,1));  
+            self.Population = Cromosome.empty;
+                
+            mv = Cromosome.get_max_value();
+            for i = 1:N
+                x = rand;
+                y = rand;
+                angle = rand;
+                length = rand;
+                depth = rand;
+                
+                x = x * mv;
+                y = y * mv;
+                angle = angle * mv;
+                length = length * mv;
+                depth = depth * mv;
+                
+                self.Population(i) = Cromosome(x, y,angle, length, depth);
             end
-            self.Population  = t;
         end
         
         function AddToPopulation(self, candidate)
