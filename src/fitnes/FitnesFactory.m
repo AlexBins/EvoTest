@@ -1,7 +1,4 @@
-classdef FitnesFactory
-    properties
-    end
-    
+classdef FitnesFactory    
     methods(Static)
         function fitnes_func = get_simple(good_fitnes_limit)
             function fitnes = fit(chr)
