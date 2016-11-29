@@ -85,11 +85,12 @@ Die Operatoren, die im genetischen Algorithmus angewendet werden, sind modular t
 % BEGIN Init
 \subsection{Initialisierung}
 \paragraph{Erklärung}
-% TODO: Yaroslav
+Die Initialisierung erzeugt die initiale Population aus N Chromosomen für den Start vom genetischen Algorithmus. Für die Erzeugung der Population werden N Chromosome mit zufälligen Werten der notwendigen Bestandteile (carx, carx, carangle, slotdepth, slotlength) erzeugt. 
 
-% Unter Umständen müssen folgende Paragraphen auch ausgefüllt werden
 \paragraph{Implementierung}
+Die Initialisierung wird in der Methode Init der Klasse GeneticAlgorithm implementiert. Es wird ein temporäres Array der Objekte der Klasse Chromosom  mit Größe N erstellt und in N Schleifendurchläufen befüllt. Je Iteration wird für jedes Bestandteil eines Chromosoms ein zufälliger Integerwert aus einer Uniformverteilung im Bereich [0, 255] generiert. Diese Werte werden folglich an den Kromosomkonstruktor übergeben. Das Ergebnis vom Konstruktor mit dem Objekt wird ins temporäre Array gespeichert. Nachdem das Array mit N Werten befüllt wurde, wird es der Eigenschaft Population des GeneticAlgorithm-Objekts zugewiesen.
 \paragraph{Probleme}
+Die Erzeugung eines Chromosoms mit voneinander unabhängig generierten Werten für dessen Bestandteile kann dazu führen, dass manche Chromosome für die Simulation nicht brauchbar ist. Allerdings  würden solche Chromosome im ersten Durchlauf nach Auswertung der Fitnessfunktion vom genetischen Algorithmus verworfen werden.
 % END Init
 
 % BEGIN Selektion
