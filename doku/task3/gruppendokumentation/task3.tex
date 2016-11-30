@@ -85,12 +85,12 @@ Die Operatoren, die im genetischen Algorithmus angewendet werden, sind modular t
 % BEGIN Init
 \subsection{Initialisierung}
 \paragraph{Erklärung}
-Die Initialisierung erzeugt die initiale Population aus N Chromosomen für den Start vom genetischen Algorithmus. Für die Erzeugung der Population werden N Chromosome mit zufälligen Werten der notwendigen Bestandteile (carx, carx, carangle, slotdepth, slotlength) erzeugt. 
+Die Initialisierung erzeugt die initiale Population aus N Chromosomen für den Start vom genetischen Algorithmus. Für die Erzeugung der Population werden N Chromosome mit zufälligen Werten der notwendigen Bestandteile (carx, cary, carangle, slotdepth, slotlength) erzeugt. 
 
 \paragraph{Implementierung}
-Die Initialisierung wird in der Methode Init der Klasse GeneticAlgorithm implementiert. Es wird ein temporäres Array der Objekte der Klasse Chromosom  mit Größe N erstellt und in N Schleifendurchläufen befüllt. Je Iteration wird für jedes Bestandteil eines Chromosoms ein zufälliger Integerwert aus einer Uniformverteilung im Bereich [0, 255] generiert. Diese Werte werden folglich an den Kromosomkonstruktor übergeben. Das Ergebnis vom Konstruktor mit dem Objekt wird ins temporäre Array gespeichert. Nachdem das Array mit N Werten befüllt wurde, wird es der Eigenschaft Population des GeneticAlgorithm-Objekts zugewiesen.
+Die Initialisierung wird in der Methode Init der Klasse GeneticAlgorithm implementiert. Die Eigenschaft Population wird als leeres Chromosomen-Array erstellt und in N Schleifendurchläufen befüllt. Je Iteration wird für jedes Bestandteil eines Chromosoms ein zufälliger Integerwert aus einer Uniformverteilung im Bereich [0, 255] generiert. Diese Werte werden im Folgenden an den Chromosomkonstruktor übergeben.
 \paragraph{Probleme}
-Die Erzeugung eines Chromosoms mit voneinander unabhängig generierten Werten für dessen Bestandteile kann dazu führen, dass manche Chromosome für die Simulation nicht brauchbar ist. Allerdings  würden solche Chromosome im ersten Durchlauf nach Auswertung der Fitnessfunktion vom genetischen Algorithmus verworfen werden.
+Die Erzeugung eines Chromosoms mit voneinander unabhängig generierten Werten für dessen Bestandteile kann dazu führen, dass manche Chromosome für die Simulation nicht brauchbar sind. Allerdings  würden solche Chromosome im ersten Durchlauf nach Auswertung der Fitnessfunktion vom genetischen Algorithmus verworfen werden.
 % END Init
 
 % BEGIN Selektion
@@ -139,6 +139,7 @@ Das Fitnessfunktion genügt der Signatur
 \begin{quote}
 	\textsf{Fitness: chromosome $\rightarrow$ number}
 \end{quote}
+Außerdem können beliebig viele Fitnessfunktionen kombiniert werden, indem man ihre einzelnen Ausgaben miteinander multipliziert.
 \begin{enumerate}
 	\item In erster Instanz wurde die Fitnessfunktion als umgekehrt proportional zum minimalen Abstand realisiert.
 	\paragraph{Implementierung}
@@ -157,7 +158,21 @@ Außerdem werden hier alle Werte $\ge$ 0 als sehr gut eingestuft, solange sie nu
 	\end{equation}
 	Im ersten Fall wird mit dem Exponenten 4 bewirkt, dass die Bestrafung für Abweichungen von der erwünschten Distanz wesentlich härter bestraft werden, wenn sie Richtung 0 gehen, als wenn sie Richtung $\infty$ gehen. Dies bewirkt, dass man sich bei der Wahl der erwünschten minimalen Distanz wesentlich zielstrebiger und mutiger verhalten kann, da sie eher über- als unterschritten wird.
 	\paragraph{Probleme} Auch wenn nun Werte der Größenordnung $10^{-5}$ nicht mehr als sehr gut angesehen werden (sofern man das nicht explizit erreichen will), können immer noch Testfälle generiert werden, die mit optimalem Abstand beginnen und danach trivial ablaufen.
-\end{enumerate} 
+	\item Eine weitere Möglichkeit für die Fitnessfunktion ist gegeben durch die Funktion, die den Abstand des Fahrzeugs zur Parklücke zu Beginn des Testfalles bewertet. Hierbei gilt: Je näher das Auto der Parklücke, desto komplexer ist der Einparkvorgang, desto besser ist der Testfall. In der Praxis gilt dies zwar nur, wenn wirklich Manövrierbedarf besteht, da die Implementierung des Parkassistenten jedoch bekannt ist, ist bekannt, dass dieser auf jeden Fall minimal aus- und wieder einparken wird.
+	\paragraph{Implementierung}
+	Für ein Chromosom $chr$ gilt:
+	\begin{equation}
+		Fitness = \frac{1}{|(x_{target}, y_{target}) ~-~ (x_{start}(chr), y_{start}(chr))}
+	\end{equation}
+	\paragraph{Probleme} Diese Implementierung führt zu Konvergenz in stets die gleiche Richtung. Die Testfälle werden sich nach $\infty$ Iterationen nicht mehr in der Position des Fahrzeuges zu Beginn unterscheiden. Außerdem berücksichtigt diese Fitnessfunktion nicht die Durchführung des Testfalles und kann - unter der Annahme, dass sinnvolle Testfälle gesucht werden - nicht alleine verwendet werden.
+	\item Eine derzeit letzte Implementierung der Fitnessfunktion bewertet die Größe der Parklücke. Sie gibt kleinen Parklücken bessere Werte als größeren. Dies macht intuitiv bereits den Einparkvorgang schwerer und reduziert auch die durchschnittliche Distanz des Fahrzeugs zu Hindernissen über die gesamte Dauer des Testfalles.
+	\paragraph{Implementierung}
+	Für ein Chromosom $chr$ gilt:
+	\begin{equation}
+		Fitness = \frac{1}{Length_{slot}(chr) + Depth_{slot}(chr)}
+	\end{equation}
+	\paragraph{Probleme} Diese Implementierung führt dazu, dass Rückwärts-Einpark-Szenarien bevorzugt werden, da die Parklücke in diesem Fall kleiner sein kann. Außerdem gilt auch für diese Fitnessfunktion, dass sie nicht alleine verwendet werden kann, sofern man sinnvolle Ergebnisse berechnen will.
+\end{enumerate}
 % END Fitness
 
 \end{document}
