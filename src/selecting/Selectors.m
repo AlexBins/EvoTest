@@ -20,7 +20,7 @@ classdef Selectors
                 current_fitness = 0;
                 idx = 0;
                 rand_number = rand * total_fitness;
-                while current_fitness < rand_number
+                while current_fitness <= rand_number
                     idx = idx + 1;
                     current_fitness =...
                         current_fitness + chromosomes(idx).fitnes;

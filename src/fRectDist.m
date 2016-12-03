@@ -1,87 +1,57 @@
 function [coll, dist] = fRectDist(A, B)
-% INPUT: A, B - matrices with rectangle coordinates [x;y] for 4 vertices in order: 
-% LowerLeft, LowerRigt, UpRigth, UpLeft
-%A = [0, 1, 1, 0; 0, 0, 1, 1];
-%B = [0, 1, 1, 0; 2, 2, 3, 3];
+    % For efficiency precalculate the B directions beforehand
+    DIRSB = zeros(2, 4);
+    DIRSB(:, 1) = B(:, 1) - B(:, 2);
+    DIRSB(:, 2) = B(:, 2) - B(:, 3);
+    DIRSB(:, 3) = -DIRSB(:, 1);
+    DIRSB(:, 4) = -DIRSB(:, 2);
+    
+    for i = 1:4
+        i1 = i + 1;
+        DIRA = A(:, i1) - A(:, i);
+        for j = 1:4
+            M = [DIRA, DIRSB(:, j)];
+            if det(M) < 10^-5 % parallel lines
+                dotp = dot(B(:, j) - A(:, i), DIRA);
+                if ...
+                        (B(2, j) - A(2, i)) *...
+                        (A(1, i1) - A(1, i)) -...
+                        (B(1, j) - A(1, i)) *...
+                        (A(2, i1) - A(2, i)) == 0 && ...
+                        ... This was the 3rd component of the cross product between the extended (B - A) and (A+1, A) vectors.
+                        ... If this component is zero, A, B and A+1 are linear dependent (are on the same line)
+                        dotp > 0 &&... If this dot product is larger than zero, B and A+1 are on the same side of A
+                        dotp <= dot(DIRA, DIRA) % If this condition is fulfilled, then B is not farther away from A than A+1
+                    % This is because dotp is B-A * A+1 - A. IFF |B-A| is
+                    % less or equal to |A+1-A| (which is what tells us,
+                    % there is a collision) then we can conclude:
+                    % |B-A| = dot(B-A, B-A) <= dot(B-A, A+1-A) <=
+                    % dot(A+1-A, A+1-A) = |A+1-A|
+                    % Thus B is on the line segment between A and A+1 =>
+                    % collision
+                    coll = 1;
+                    dist = 0;
+                    return;
+                end
+            else
+                v = M \ (B(:, j) - A(:, i));
 
-% calculate axes for projection
-%A
-a1 = A(:,2) - A(:,1);
-a2 = A(:,4) - A(:,1);
-%B
-a3 = B(:,2) - B(:,1);
-a4 = B(:,4) - B(:,1);
-axes = [a1, a2, a3, a4];
-out = struct('A',[],'B',[], 'projax', [], 'maxA', [], 'minA', [], 'maxB', [], 'minB', [], 'dist', []);
-coll = 1;
-
-
-% Project all rectangle vertices on axes
-for a = 1 : 4 % iterate over projecting axes
-%     if coll == 0
-%         break
-%     end
-ax = axes(:, a);
-out(a).projax = ax;
-dist = nan;
-
-% project each vertex of rectangle A on selected projecting ax
-outA = [];
-for i = 1:4
-        vertex = A(:, i);
-        proj = vertex'* ax/(ax'*ax)*ax; 
-        outA = [outA, proj];        
-end
-
-
-% save projected vectors to struct
-out(a).A = outA;
-[out(a).maxA(1,1), out(a).maxA(1,2)]  = max(ax'*outA); % dot muplitply projected vector by the projection axis to get scalar value for comparison
-[out(a).minA(1,1), out(a).minA(1,2)]  = min(ax'*outA);
-
-% project each vertex of rectangle B on selected projecting ax
-outB = [];
-for i = 1:4
-        vertex = B(:, i);
-        proj = vertex'* ax/(ax'*ax)*ax; 
-        outB = [outB, proj];
-end
-
-% save to struct
-out(a).B = outB;
-[out(a).maxB(1,1), out(a).maxB(1,2)]  = max(ax'*outB);
-[out(a).minB(1,1), out(a).minB(1,2)]  = min(ax'*outB);
-
-% evaluate collision
-% check collision and calculate distance in no collision
-% compare scalar values and decide if rectangles overlap
-% TD: write function for euclidian distance
-if (out(a).maxA(1,1) < out(a).minB(1,1)) ||  (out(a).maxB(1,1) < out(a).minA(1,1))
-    coll = 0;
-    if (out(a).maxA(1,1) < out(a).minB(1,1))
-        dist = (((out(a).B(1, out(a).minB(1,2))-out(a).A(1, out(a).maxA(1,2)))^2 + (out(a).B(2, out(a).minB(1,2))-out(a).A(2, out(a).maxA(1,2)))^2))^0.5;
-  
-    else
-        dist = (((out(a).A(1, out(a).minA(1,2))-out(a).B(1, out(a).maxB(1,2)))^2 + (out(a).A(2, out(a).minA(1,2))-out(a).B(2, out(a).maxB(1,2)))^2))^0.5;
-        
+                if 0 <= v(1) && v(1) <= 1 && 0 <= v(2) && v(2) <= 1
+                    coll = 1;
+                    dist = 0;
+                    return;
+                end
+            end
+        end
     end
-end
-out(a).dist = dist;
-end
-mdist = nan;
-
- 
-for j = 1:4
-    if (isnan(mdist) ==1) || (out(j).dist > mdist)
-        mdist = out(j).dist;
+    
+    coll = false;
+    distances = zeros(16, 1);
+    for i = 1:4
+        for j = 1:4
+            distances((i - 1) * 4 + j) = sum((A(:,i) - B(:, j)) .^ 2);
+        end
     end
-end
-
-dist = mdist;
-
-if isnan(dist)
-    coll = 1;
-else
-    coll = -1;
-end
+    
+    dist = sqrt(min(distances));
 end
