@@ -16,7 +16,7 @@ select =  SelectCandidateFactory.get_generic(Selectors.get_fitnessWeighted());
 merger = MergeFactory.get_generic(Merges.get_naiverandommerge());
 
 gen = GeneticAlgorithm(10, 1, 0.5, fit, select, merger, rational);
-gen.main(100, true);
+gen.main(500, true);
 
 for i = 1:length(gen.Population)
     close all;

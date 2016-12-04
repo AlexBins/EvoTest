@@ -99,19 +99,31 @@ classdef GeneticAlgorithm < handle
                 % Select, merge, mutate and add
                 prnt('creating', nNewCandidatesPerEpoch, 'new candidates');
                 start_time();
-                for i = 1:nNewCandidatesPerEpoch
+                
+                nPop = Cromosome.empty;
+                for i = 1:self.PopulationSize % nNewCandidatesPerEpoch
                     parent1 = self.SelectCandidateFunction(self.Population);
                     parent2 = self.SelectCandidateFunction(self.Population);
                     
                     newCandidate = self.MergeFunction(parent1, parent2);
                     newCandidate = self.MutateFunction(newCandidate);
                     
-                    self.AddToPopulation(newCandidate);
+                    if self.Epoch <= MaxEpoch * 0.95                    
+                        newCandidate.fitnes = self.FitnessFunction(newCandidate);
+                        self.max_fitnes = max(self.max_fitnes, newCandidate.fitnes);
+                        nPop(i) = newCandidate;                    
+                    else                    
+                        self.AddToPopulation(newCandidate);
+                    end
                 end
                 end_time()
                 
-                % Reduce the population again
-                self.ReducePopulation();
+                if self.Epoch <= MaxEpoch * 0.8
+                    self.Population = nPop;
+                else
+                    % Reduce the population again
+                    self.ReducePopulation();
+                end
                 
                 if self.Epoch >= MaxEpoch
                     return;

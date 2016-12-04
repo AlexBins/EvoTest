@@ -41,6 +41,8 @@ classdef Scenario < handle
             % vector.duration with n in Natural Numbers and the inequation
             % dt < 0.1 / vector.velocity and dt being maximal
             
+            self.UpdateCollisionState();
+            
             % iterate over the control matrix
             for idx=1:size(control_matrix, 1)
                 
@@ -69,29 +71,36 @@ classdef Scenario < handle
                     % move the car according to the provided information
                     self.Car.Move(velocity, steering_angle, dt);
                     
-                    car_rect = self.Car.GetRectangle();
-                    for iElement = 1:length(self.World.RElements)
-                        i_rect = self.World.RElements(iElement).GetRectangle();
-                        
-                        [doCollide, distance] = fRectDist(car_rect, i_rect);
-                        
-                        if doCollide == 1
-                            self.Collision = true;
-                        end
-                        if isnan(self.MinDistance)
-                            self.MinDistance = distance;
-                        elseif (~isnan(distance))
-                            if (distance < self.MinDistance)
-                                self.MinDistance = distance;
-                            end
-                        end
-                    end
+                    % Check for collision
+                    self.UpdateCollisionState();
+                    
                     % Log the new positions
                     self.Trajectory.LogCar(self.Car, dt);
                 end
             end
             
             
+        end
+        
+        function UpdateCollisionState(self)
+                    
+            car_rect = self.Car.GetRectangle();
+            for iElement = 1:length(self.World.RElements)
+                i_rect = self.World.RElements(iElement).GetRectangle();
+
+                [doCollide, distance] = fRectDist(car_rect, i_rect);
+
+                if doCollide == 1
+                    self.Collision = true;
+                end
+                if isnan(self.MinDistance)
+                    self.MinDistance = distance;
+                elseif (~isnan(distance))
+                    if (distance < self.MinDistance)
+                        self.MinDistance = distance;
+                    end
+                end
+            end
         end
         
         function DriveCircle(self, velocity, steering_angle, duration, dt)
