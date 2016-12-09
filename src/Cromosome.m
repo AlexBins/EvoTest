@@ -25,7 +25,7 @@ classdef Cromosome < handle
             bit_max = Cromosome.get_max_value();
             x = 15*self.carx/bit_max - 7.5;
             y = 5*self.cary/bit_max - 1;
-            angle = 360*self.carangle/bit_max;
+            angle = 2*pi*self.carangle/bit_max;
             length = 2.75*self.slotlength/bit_max + 2.25;
             depth = self.slotdepth/bit_max + 1;
         end
