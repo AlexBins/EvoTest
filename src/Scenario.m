@@ -43,6 +43,8 @@ classdef Scenario < handle
             
             self.UpdateCollisionState();
             
+            self.Trajectory.LogCar(self.Car, 0);
+            
             % iterate over the control matrix
             for idx=1:size(control_matrix, 1)
                 

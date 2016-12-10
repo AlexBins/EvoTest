@@ -33,7 +33,11 @@ classdef Trajectory < handle
         end
         
         function duration = GetDuration(self)
-            duration = self.Timestamps(length(self.Timestamps));
+            if isempty(self.Timestamps)
+                duration = 0;
+            else
+                duration = self.Timestamps(length(self.Timestamps));
+            end
         end
         
         function [x, y, angle] = GetAtTime(self, time)
