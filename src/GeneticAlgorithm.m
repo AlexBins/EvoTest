@@ -55,6 +55,8 @@ classdef GeneticAlgorithm < handle
             
         end
         function main(self, max_epoch, varargin)
+            
+            perc_replace = 0.95;
             if length(varargin) >= 1 && varargin{1}  
                 prnt = @Utility.print;
             else
@@ -108,7 +110,7 @@ classdef GeneticAlgorithm < handle
                     newCandidate = self.MergeFunction(parent1, parent2);
                     newCandidate = self.MutateFunction(newCandidate);
                     
-                    if self.Epoch <= MaxEpoch * 0.95                    
+                    if self.Epoch <= MaxEpoch * perc_replace                
                         newCandidate.fitnes = self.FitnessFunction(newCandidate);
                         self.max_fitnes = max(self.max_fitnes, newCandidate.fitnes);
                         nPop(i) = newCandidate;                    
@@ -118,7 +120,7 @@ classdef GeneticAlgorithm < handle
                 end
                 end_time()
                 
-                if self.Epoch <= MaxEpoch * 0.8
+                if self.Epoch <= MaxEpoch * perc_replace
                     self.Population = nPop;
                 else
                     % Reduce the population again
