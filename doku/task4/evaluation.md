@@ -68,4 +68,3 @@ Es werden folgende Manipulationen angenommen:
 		Orientation (mean, std): 3.691803	2.331866
 		Slot-Length (mean, std): 2.308667	0.092787
 		Slot-Depth  (mean, std): 1.116588	0.148013
-		Fitness     (mean, std): 0.036517	0.007246

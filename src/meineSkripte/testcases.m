@@ -17,6 +17,8 @@ i = i+1;
 population(i) = Cromosome.from_physical(2.5, 0, pi, 5, 1); % bad left hand side parking and collision
 i = i+1;
 population(i) = Cromosome.from_physical(-2.5, 0, pi, 5, 1); % bad left hand side parking
+i = i+1;
+population(i) = Cromosome.from_physical(2, 0, 0, 5, 1); % bad left hand side parking
 
 fit = FitnesFactory.get_combined(FitnesFactory.get_desired_mindistance(1, 0.05), FitnesFactory.get_min_parking_slot(), FitnesFactory.get_min_distance_start());
 for i=1:length(population)
