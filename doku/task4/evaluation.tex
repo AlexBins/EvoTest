@@ -10,19 +10,22 @@
 \author{Manuel Mende}
 \title{Evaluation des genetischen Algorithmus}
 \begin{document}
+
 \maketitle
 \section{Manuell erzeugte Testfälle}
 Um die vom genetischen Algorithmus erzeugten Testfälle bewerten zu können, werden Testfälle zum Vergleich benötigt. Einige sinnvolle Testfälle werden in Tabelle \ref{tab:testfaelle} präsentiert.
 \begin{table}\centering
 \begin{tabular}{l|l|l|l|l}
 Position & Winkel & Parklücke & Fitness & Reale Eignung \\\hline
-5/0 & 0 & 2.5/1 & $0.0$ & Kollision \\\hline
--5/0 & 0 & 2.5/1 & $0.0$ & Kollision \\\hline
-4/0 & 0 & 2.5/1 & $0.039828$ & Beinahe Kollision\\\hline
--4/0 & 0 & 2.5/1 & $0.039828$ & Beinahe Kollision\\\hline
-2/0 & 270 & 2.5/1 & $0.0$ & Kollision \\\hline
-2.5/0 & 180 & 5/2 & $0.0$ & Falsches Ziel und Kollision \\\hline
+5/0 & 0 & 2.5/1 & $0.0$ & Kollision \\
+-5/0 & 0 & 2.5/1 & $0.0$ & Kollision \\
+4/0 & 0 & 2.5/1 & $0.039828$ & Beinahe Kollision \\
+-4/0 & 0 & 2.5/1 & $0.039828$ & Beinahe Kollision \\
+2/0 & 270 & 2.5/1 & $0.0$ & Kollision \\
+2.5/0 & 180 & 5/2 & $0.0$ & Falsches Ziel und Kollision \\
 -2.5/0 & 180 & 5/2 & $0.008106$ & Falsches Ziel \\
+0,4 &  0 & 2.5/1 & 0.020079 & Merkwürdige Fahrspur \\
+0,0 &  0 & 5/2 & 0.006673 & Merkwürdige Fahrspur \\
 \end{tabular}
 \caption{Manuell gewählte Testfälle}
 \label{tab:testfaelle}
