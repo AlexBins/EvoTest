@@ -48,6 +48,16 @@ classdef Cromosome < handle
         function val = get_max_value()
             val = 255;
         end
+        
+        function chr = from_physical(x, y, angle, length, depth)
+            bit_max = Cromosome.get_max_value();
+            x = bit_max*(x+7.5)/15;
+            y = bit_max*(y+1)/5;
+            angle = bit_max*angle/(2*pi);
+            length = bit_max*(length-2.25)/2.75;
+            depth = bit_max*(depth-1);
+            chr = Cromosome(x, y, angle, length, depth);
+        end
     end
 end
 

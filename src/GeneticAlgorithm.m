@@ -95,7 +95,7 @@ classdef GeneticAlgorithm < handle
             nNewCandidatesPerEpoch = ceil(nNewCandidatesPerEpoch);
             
             % Enter the epoch loop
-            while true
+            while self.Epoch <= MaxEpoch
                 prnt('starting epoch:', self.Epoch);
                 self.Epoch = self.Epoch + 1;
                 % Select, merge, mutate and add
@@ -125,10 +125,6 @@ classdef GeneticAlgorithm < handle
                 else
                     % Reduce the population again
                     self.ReducePopulation();
-                end
-                
-                if self.Epoch >= MaxEpoch
-                    return;
                 end
             end
         end
