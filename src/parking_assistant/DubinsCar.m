@@ -90,7 +90,7 @@ classdef DubinsCar
             % Find shortest trajectory backward by swapping goal and start
             min_csc_rev = NaN;
             for i = {'RSR', 'RSL', 'LSL', 'LSR'}
-                csc_rev = getCSCTraject(G, S, r, cell2mat(i));
+                csc_rev = DubinsCar.getCSCTraject(G, S, r, cell2mat(i));
                 if ~isnan(csc_rev) 
                     if (isnan(min_csc_rev)) || (min_csc_rev > sum(csc_rev(3,:), 2))
                         min_csc_rev = sum(csc_rev(3,:), 2);
