@@ -1,4 +1,5 @@
 % TODO Replace with the implementation in GeometricUtility.plotCircle
+% DONE
 function [ handle ] = plotCircle( x, y, radius, varargin )
     % plotcircle: Plots a circle around (x, y) with the given radius.
     %   'if alpha and beta are not given, the whole circle is drawn

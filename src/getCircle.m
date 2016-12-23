@@ -1,4 +1,5 @@
 % TODO Replace with implementation in GeometricUtility.getCircle
+% DONE
 function [ x, y, r ] = getCircle( mx, my, mr, sx, sy, su, sv, lambda_start )
         
     % getcircle: enhances the location of the circle on the line defined by

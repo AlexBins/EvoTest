@@ -90,7 +90,7 @@ classdef Scenario < handle
             for iElement = 1:length(self.World.RElements)
                 i_rect = self.World.RElements(iElement).GetRectangle();
 
-                [doCollide, distance] = fRectDist(car_rect, i_rect);
+                [doCollide, distance] = GeometricUtility.fRectDist(car_rect, i_rect);
 
                 if doCollide == 1
                     self.Collision = true;

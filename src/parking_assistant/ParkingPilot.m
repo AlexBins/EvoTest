@@ -75,8 +75,8 @@ classdef ParkingPilot < handle
                 orthogonaldirectionp = cross([cartotargetcircle; 0], upordown);
                 orthogonaldirection = [orthogonaldirectionp(1); orthogonaldirectionp(2)];
                 orthogonalstart = (closestpointontargetcircle + carl) / 2;
-                orthogonalline = cross(PointToProj(orthogonalstart), PointToProj(orthogonalstart + orthogonaldirection));
-                carline = cross(PointToProj(carl), PointToProj(carl + carn));
+                orthogonalline = cross(GeometricUtility.PointToProj(orthogonalstart), GeometricUtility.PointToProj(orthogonalstart + orthogonaldirection));
+                carline = cross(GeometricUtility.PointToProj(carl), GeometricUtility.PointToProj(carl + carn));
                 circcarp = cross(carline, orthogonalline);
 
                 if debug
@@ -88,7 +88,7 @@ classdef ParkingPilot < handle
 
                 % transform the point from projective geometry to normal
                 % 2D geometry
-                circcar = PointFromProj(circcarp);
+                circcar = GeometricUtility.PointFromProj(circcarp);
 
                 if debug
                     plot(circcar(1), circcar(2), 'rx');
@@ -100,7 +100,7 @@ classdef ParkingPilot < handle
                 % If the intersection lies "behind" the car location
                 % (perspective: looking in carn direction)
                 if sign(vectocross(1)) == sign(carn(1))
-                    [tmpx, tmpy, tmpr] = getCircle(circtarget(1), circtarget(2), radtarget,...
+                    [tmpx, tmpy, tmpr] = GeometricUtility.getCircle(circtarget(1), circtarget(2), radtarget,...
                         carl(1), carl(2), carn(1), carn(2), lambda);
                     circcar = [tmpx; tmpy];
                     radcar = tmpr;
@@ -143,7 +143,7 @@ classdef ParkingPilot < handle
                 else
                     amount = 1;
                 end
-                dir = turn2DVec(targetn, amount * 4 * pi / 6);
+                dir = GeometricUtility.turn2DVec(targetn, amount * 4 * pi / 6);
                 dir = dir / norm(dir);
                 circcar = circtarget + dir * 2 * minRadius;
                 radcar = minRadius;
@@ -156,7 +156,7 @@ classdef ParkingPilot < handle
                     radcar, radtarget, targetd, targetd, debug);
                 
                 if debug
-                    drawGS(geometricSequence);
+                    Utility.drawGS(geometricSequence);
                     quiver(dubinTarget(1), dubinTarget(2), targetd(1) * 3, targetd(2) * 3, 'Color', 'r');
                 end
             end

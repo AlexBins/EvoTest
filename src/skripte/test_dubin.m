@@ -32,7 +32,7 @@ minr = sc.Car.Width / tan(msa);
 %     plot(dl(1), dl(2), 'rx');
 %     quiver(dl(1), dl(2), cos(do), sin(do), 'Color', 'r');
 %     
-%     drawGS(gs);
+%     Utility.drawGS(gs);
 % end
 
 if ~ip

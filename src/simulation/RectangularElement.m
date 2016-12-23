@@ -26,10 +26,10 @@ classdef RectangularElement < Element
             end
             x = self.GetX();
             y = self.GetY();
-            rect = CreateRectangle(x - self.Width / 2, y - self.Height / 2, self.Width, self.Height);
-            tlin = CreateTranslation(-x, -y);
-            tlout = CreateTranslation(x, y);
-            rot = CreateRotation(self.GetOrientationRadians());
+            rect = GeometricUtility.CreateRectangle(x - self.Width / 2, y - self.Height / 2, self.Width, self.Height);
+            tlin = GeometricUtility.CreateTranslation(-x, -y);
+            tlout = GeometricUtility.CreateTranslation(x, y);
+            rot = GeometricUtility.CreateRotation(self.GetOrientationRadians());
             rect = tlout * rot * tlin * rect;
             self.plot_handle = fill(rect(1,:), rect(2,:), color);
         end

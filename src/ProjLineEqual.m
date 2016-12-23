@@ -1,4 +1,6 @@
-% TODO Replace with GeometricUtility.turn2DVec
+% TODO Replace with GeometricUtility.ProjLineEqual
+% DONE
+% Annotation: Unused, consider Removing
 function [ isEqual ] = ProjLineEqual( l1, l2 )
     l1 = l1 / norm(l1);
     l2 = l2 / norm(l2);

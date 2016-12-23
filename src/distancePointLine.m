@@ -1,4 +1,6 @@
 % TODO Replace with implementation in GeometricUtility.distancePointLine
+% DONE
+% Annotation: Unused, consider removing
 function [ distance, pl ] = distancePointLine( pp, l )
     l1 = [l(1, 1) l(2, 1)];
     l2 = [l(1, 2) l(2, 2)];
