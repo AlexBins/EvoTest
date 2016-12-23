@@ -36,7 +36,7 @@ minr = sc.Car.Width / tan(msa);
 % end
 
 if ~ip
-    ctrl_mat = getDubinsPath([sc.Car.GetX() sc.Car.GetY() sc.Car.GetOrientationRadians()], [dl(1) dl(2) do], minr);
+    ctrl_mat = DubinsCar.getDubinsPath([sc.Car.GetX() sc.Car.GetY() sc.Car.GetOrientationRadians()], [dl(1) dl(2) do], minr);
     ctrl_mat = transpose(ctrl_mat);
     
     for i = 1:3

@@ -1,4 +1,5 @@
 % TODO Replace with implementation in DubinsCar.getArcLength
+% DONE
 function al = getArcLength(center, p1, p2, radius, left)
 v1 = p1'-center';
 v2 = p2' - center';

@@ -1,4 +1,5 @@
 % TODO Replace with the implementation in DubinsCar.getInvTraject
+% DONE
 function tinv = getInvTraject(t)
 % reverse the order of columns in the matrix to get the reverse of a given
 % trajectory

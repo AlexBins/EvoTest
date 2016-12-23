@@ -1,4 +1,5 @@
 % TODO Replace with the implementation in DubinsCar.getCSCTraject
+% DONE
 function [tr, handlec1, handlec2, handlel1] = getCSCTraject(sp, gp, r, type)
 debug = false;
 

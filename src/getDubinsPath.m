@@ -1,4 +1,5 @@
 % TODO Replace with the implementation in DubinsCar.getDubinsPath
+% DONE
 function tr_out = getDubinsPath(S, G, r )
 % This funtions finds the shortest CSC path from point S to point G
 % Each Path consists of a 3 subpaths : Left/Right, Straight, Left/Right

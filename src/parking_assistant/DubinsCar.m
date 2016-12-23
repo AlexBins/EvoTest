@@ -75,7 +75,7 @@ classdef DubinsCar
             % Find shortest CSC trajectory, forward
             min_csc = NaN;
             for i = {'RSR', 'RSL', 'LSL', 'LSR'}
-                [csc, ~, ~, ~] = getCSCTraject(S, G, r, cell2mat(i));
+                csc = DubinsCar.getCSCTraject(S, G, r, cell2mat(i));
                 if ~isnan(csc) 
                     if (isnan(min_csc)) || (min_csc > sum(csc(3,:), 2))
                         min_csc = sum(csc(3,:), 2);
@@ -108,7 +108,7 @@ classdef DubinsCar
                 % presents a better solution
 
                 % invert order of signals
-                tr_out = getInvTraject(tr_opt_rev);
+                tr_out = DubinsCar.getInvTraject(tr_opt_rev);
                 % invert speed/moving direction
                 tr_out(1,:) = -1*tr_out(1,:);
             else
@@ -120,15 +120,15 @@ classdef DubinsCar
             % calc CSC trajectory 
             vel = 1;
             % get cirles
-            crc1 = [sp(1)+ getEncDir(type, 1)* r*cos(sp(3)-pi/2), sp(2)+ getEncDir(type, 1)*r*sin(sp(3)-pi/2)];
-            crc2 = [gp(1)+ getEncDir(type, 3)*r*cos(gp(3)-pi/2), gp(2)+getEncDir(type, 3)*r*sin(gp(3)-pi/2)];
+            crc1 = [sp(1)+ DubinsCar.getEncDir(type, 1)* r*cos(sp(3)-pi/2), sp(2)+ DubinsCar.getEncDir(type, 1)*r*sin(sp(3)-pi/2)];
+            crc2 = [gp(1)+ DubinsCar.getEncDir(type, 3)*r*cos(gp(3)-pi/2), gp(2)+DubinsCar.getEncDir(type, 3)*r*sin(gp(3)-pi/2)];
 
             % set constant speed, forward direction for all phases
             v1 = vel;
             v2 = vel;
             v3 = vel;
             % get tangent
-            tl = getTanLine(crc1, crc2, r, strcat(type(1), type(3)));
+            tl = DubinsCar.getTanLine(crc1, crc2, r, strcat(type(1), type(3)));
 
             if isnan(tl)
                 tr = NaN;
@@ -137,12 +137,12 @@ classdef DubinsCar
 
             tl_length = ((tl(1,2)-tl(1, 1))^2 + (tl(2,2)-tl(2, 1))^2)^0.5;
             % get arcs
-            al1 = getArcLength(crc1, sp(1:2), tl(:,1)', r, getEncDir(type, 1));
+            al1 = DubinsCar.getArcLength(crc1, sp(1:2), tl(:,1)', r, DubinsCar.getEncDir(type, 1));
             if al1 >= pi*r
                 al1 = 2*pi*r-al1;
                 v1 = -1*v1;
             end
-            al2 = getArcLength(crc2, tl(:,2)', gp(1:2), r, getEncDir(type, 3));
+            al2 = DubinsCar.getArcLength(crc2, tl(:,2)', gp(1:2), r, DubinsCar.getEncDir(type, 3));
             % drive the smaller arc in reverse if al2 bigger then half the
             % circumference
             if al2 >= pi*r
@@ -150,7 +150,7 @@ classdef DubinsCar
                 v3 = -1*v3;
             end
             tr = [v1, v2, v3;
-                getEncDir(type, 1), getEncDir(type, 2), getEncDir(type, 3); 
+                DubinsCar.getEncDir(type, 1), DubinsCar.getEncDir(type, 2), DubinsCar.getEncDir(type, 3); 
                 al1/abs(v1), tl_length/abs(v2), al2/abs(v3)];
 
         end
