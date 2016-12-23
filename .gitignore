@@ -1,0 +1,10 @@
+# Matlab autosave files
+*.asv
+
+# LaTex stuff not needed for commit
+*.aux
+*.bbl
+*.blg
+*.log
+*.synctex
+*.toc
