@@ -1,3 +1,5 @@
+% Apart from the function not working correctly, it is not used anyways
+% TODO Delete
 function [ yy ] = interpolate( x, y, xx )
     curmin = 1;
     yy = zeros(length(xx), 1);

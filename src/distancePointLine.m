@@ -1,3 +1,4 @@
+% TODO Replace with implementation in GeometricUtility.distancePointLine
 function [ distance, pl ] = distancePointLine( pp, l )
     l1 = [l(1, 1) l(2, 1)];
     l2 = [l(1, 2) l(2, 2)];
@@ -18,4 +19,3 @@ function [ distance, pl ] = distancePointLine( pp, l )
     pl = l1 + scale * va;
     distance = sqrt(dot(pl - p, pl - p));
 end
-

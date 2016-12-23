@@ -1,3 +1,4 @@
+% TODO Replace with the implementation in DubinsCar.getEncDir
 function d = getEncDir(sd, pos)
 switch sd(pos)
     case 'R'

@@ -1,3 +1,4 @@
+% TODO Replace with implementation in Utility.drawGS
 function drawGS(gs)
     for i = 1:gs.length()
         element = gs.getAt(i);

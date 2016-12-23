@@ -1,3 +1,4 @@
+% TODO Remove (unused)
 function [ distance, vertex, linePoint] = calculateDistance( element1, element2 )
     x = element1.GetX();
     y = element1.GetY();

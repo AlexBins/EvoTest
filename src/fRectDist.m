@@ -1,3 +1,4 @@
+% TODO Replace with implementation in GeometricUtility.fRectDist
 function [coll, dist] = fRectDist(A, B)
     % For efficiency precalculate the B directions beforehand
     DIRSB = zeros(2, 4);
