@@ -15,7 +15,7 @@ classdef Selectors
                 n = length(chromosomes);
                 total_fitness = 0;
                 for i = 1:n
-                    total_fitness = total_fitness + chromosomes(i).fitnes;
+                    total_fitness = total_fitness + chromosomes(i).fitness;
                 end
                 current_fitness = 0;
                 idx = 0;
@@ -23,7 +23,7 @@ classdef Selectors
                 while current_fitness <= rand_number
                     idx = idx + 1;
                     current_fitness =...
-                        current_fitness + chromosomes(idx).fitnes;
+                        current_fitness + chromosomes(idx).fitness;
                 end
                 selected = chromosomes(idx);
             end

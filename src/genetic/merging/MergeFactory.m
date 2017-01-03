@@ -8,8 +8,8 @@ classdef MergeFactory
             instance.merge_handle = merge_handle;
         end
         
-        function merged = merge(self, cromosome1, cromosome2)
-            merged = self.merge_handle(cromosome1, cromosome2);
+        function merged = merge(self, Chromosome1, Chromosome2)
+            merged = self.merge_handle(Chromosome1, Chromosome2);
         end
     end
     

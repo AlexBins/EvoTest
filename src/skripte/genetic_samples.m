@@ -3,11 +3,11 @@
 close all;
 rational = MutatorFactory.get_range(0.1);
 
-% a fitnes function
-% 50 is the maximal value of the fitnes
-%fit = FitnesFactory.get_desired_mindistance(50, 0.05);
-fit = FitnesFactory.get_combined(FitnesFactory.get_desired_mindistance(1, 0.05),...
-    FitnesFactory.get_min_parking_slot(), FitnesFactory.get_min_distance_start());
+% a fitness function
+% 50 is the maximal value of the fitness
+%fit = FitnessFactory.get_desired_mindistance(50, 0.05);
+fit = FitnessFactory.get_combined(FitnessFactory.get_desired_mindistance(1, 0.05),...
+    FitnessFactory.get_min_parking_slot(), FitnessFactory.get_min_distance_start());
 
 % a selector
 select =  SelectCandidateFactory.get_generic(Selectors.get_fitnessWeighted());

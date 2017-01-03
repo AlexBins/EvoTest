@@ -4,9 +4,9 @@ function population = evolute(pop_size, new_pop, max_epochs, verbose)
     close all;
     rational = MutatorFactory.get_range(0.1);
 
-    % a fitnes function
-    fit = FitnesFactory.get_combined(FitnesFactory.get_desired_mindistance(1, 0.05),...
-        FitnesFactory.get_min_parking_slot(), FitnesFactory.get_min_distance_start());
+    % a fitness function
+    fit = FitnessFactory.get_combined(FitnessFactory.get_desired_mindistance(1, 0.05),...
+        FitnessFactory.get_min_parking_slot(), FitnessFactory.get_min_distance_start());
 
     % a selector
     select =  SelectCandidateFactory.get_generic(Selectors.get_fitnessWeighted());
