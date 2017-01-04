@@ -29,12 +29,13 @@ classdef GenericGA
         % a mutated version of it
         MutateFunction
         
+        % Enables console logging
         verbose=false;
     end
     
     methods
-        % Class constructor
         function obj = GenericGA(reprate, fitfunc, selcfunc, mergfunc, mutfunc)
+            % Class constructor
             obj.ReproductionRate = reprate;
             obj.FitnessFunction = fitfunc;
             obj.SelectCandidateFunction = selcfunc;
@@ -49,13 +50,19 @@ classdef GenericGA
         end
 
         function runEpochs(self, population, iterations)
+            % Runs iterations epochs on a given population
+            self.log('Started iteration segment');
             self.computeFitness(population);
             for i = 1:iterations
+                self.log(sprintf('Iteration-Counter: %i/%i', i, iterations));
                 self.runEpoch(population);
             end
         end
 
+        
         function runEpoch(self, population)
+        % Run one epoch of the GA
+        % The population-argument must provide valid fitnes values
             self.log('started a new epoch');
             number_of_new_chromosomes = length(population.chromosomes) * self.ReproductionRate;
             
@@ -77,12 +84,11 @@ classdef GenericGA
         end
         
         function computeFitness(self, population)
+            % Computes the fitnes for a whole population
             self.log('Fitness-computation');
             for i = 1:length(population.chromosomes)
-                if isnan(population.chromosomes(i).fitness)
-                    fitness = self.FitnessFunction(population.chromosomes(i));
-                    population.chromosomes(i).fitness = fitness;
-                end
+                fitness = self.FitnessFunction(population.chromosomes(i));
+                population.chromosomes(i).fitness = fitness;
             end
         end
     end
