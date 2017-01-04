@@ -41,8 +41,8 @@ classdef Chromosome < handle
     end
     
     methods (Static)
-        function Chromosome = get_random()
-            Chromosome = Chromosome(rand, rand, rand, rand, rand);
+        function chromosome = get_random()
+            chromosome = Chromosome(rand, rand, rand, rand, rand);
         end
         
         function val = get_max_value()
