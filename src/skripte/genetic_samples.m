@@ -16,13 +16,13 @@ select =  SelectCandidateFactory.get_generic(Selectors.get_fitnessWeighted());
 merger = MergeFactory.get_generic(Merges.get_naiverandommerge());
 
 gen = GeneticAlgorithm(10, 1, 0.1, fit, select, merger, rational);
-gen.main(20, true);
+gen.main(200, true);
 
 for i = 1:length(gen.Population)
     close all;
     sc = gen.Population(i).get_scenario();
     sc.RunParkingPilot();
     sc.Replay(0.04, 3);
-    return;
+    
     pause(2);
 end

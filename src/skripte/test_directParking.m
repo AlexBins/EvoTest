@@ -4,8 +4,8 @@ figure;
 hold on;
 axis([-4 4 -2 6]);
 
-sc = StaticScenario(-1, 2, pi / 4);
-sc.test();
+sc = StaticScenario(0, 2, 3 *pi / 4);
+sc.RunParkingPilot();
 
 if plotTrajectory
     tr = sc.Trajectory;
@@ -13,4 +13,4 @@ if plotTrajectory
 end
 
 sc.DisplayScenario(0);
-%sc.Replay(1 / 60, 1);
+sc.Replay(1 / 60, 1);
