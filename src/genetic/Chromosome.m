@@ -42,7 +42,8 @@ classdef Chromosome < handle
     
     methods (Static)
         function chromosome = get_random()
-            chromosome = Chromosome(rand, rand, rand, rand, rand);
+            mav_val = Chromosome.get_max_value();
+            chromosome = Chromosome(randi(mav_val)-1,randi(mav_val)-1,randi(mav_val)-1,randi(mav_val)-1,randi(mav_val)-1);
         end
         
         function val = get_max_value()
