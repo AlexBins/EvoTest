@@ -17,7 +17,7 @@ classdef Population < handle
         
         function add(self, chromosome)
             current_idx = length(self.chromosomes);
-            self.chromosomes(current_idx+1) = chromosome;
+            self.chromosomes(current_idx + 1) = chromosome;
         end
         
         function extend(self, chromosomes)
@@ -39,6 +39,24 @@ classdef Population < handle
                 end
                 self.chromosomes(current_worst_idx) = [];
             end
+        end
+        
+        function remove(self, idx)
+        % removes a chromosome with a given position index from the
+        % population    
+            if (idx <= self.size)
+                self.chromosomes(idx) = [];
+                self.size = self.size - 1;
+            else
+                self.log('Chromosome index out of range');
+            end
+        end
+        
+        function insert(self, chromosome)
+        % Inserts new chromosome into population and updates population size    
+            current_idx = length(self.chromosomes);
+            self.chromosomes(current_idx + 1) = chromosome;
+            self.size = self.size + 1;
         end
     end
     
