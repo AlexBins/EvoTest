@@ -1,6 +1,9 @@
 classdef FitnessFactory    
     methods(Static)
         function fitness_func = get_complete()
+            % This function returns a complete fitness function, taking
+            % care of slot size, collision distance and minimal distance but not the car position (since this differs
+            % from Population to Population)
             function fitness_value = fitness(chr)
                 % Get the scenario. Simulation already complete.
                 scenario = chr.get_scenario();
