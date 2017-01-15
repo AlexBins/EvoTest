@@ -48,6 +48,59 @@ classdef FitnessFactory
             fitness_func = @fitness;
         end
         
+        function fitness_func = get_car_orientation_evaluating(orientation_to_evaluation_function)
+            % Returns a fitness function evaluating chromosomes' fitness by
+            % the car's initial orientation (according to the given R -> [0,
+            % 1] function)function fitness_value = fitness(chr)
+            function fitness_value = fitness(chr)
+                [~, ~, angle, ~, ~] = chr.get_physical_data();
+                fitness_value = max([0 min([1 orientation_to_evaluation_function(angle)])]);
+            end
+            fitness_func = @fitness;
+        end
+        
+        function fitness_func = get_car_orientation_punishing(min_angle, max_angle, punishing_factor)
+            % Returns a fitness function punishing chromosomes' fitness by
+            % the car's initial orientation (min_angle and max_angle
+            % between 0 and 2 * pi and punishing_factor is the fitness
+            % value multiplied with, if the actual angle is outside of
+            % this range)
+            function value = punish(angle)
+                angle = mod(angle + 2 * pi, 2 * pi);
+                if min_angle > angle || max_angle < angle
+                    value = punishing_factor;
+                else
+                    value = 1;
+                end
+            end
+            fitness_func = get_car_orientation_evaluating(@punish);
+        end
+        
+        function fitness_func = get_car_location_punishing(line_start_point, line_direction, expecting_left_of_line, punishing_factor)
+            % Returns a fitness function punishing chromosomes' fitness by
+            % the car's initial location (if the location is on the wrong
+            % side of the lane, the punishing factor is applied)
+            function value = punish(location)
+                if GeometricUtility.IsLeftOfLine(location, line_start_point, line_direction) == expecting_left_of_line
+                    value = 1;
+                else
+                    value = punishing_factor;
+                end
+            end
+            fitness_func = get_car_location_evaluating(@punish);
+        end
+        
+        function fitness_func = get_car_location_evaluating(location_to_evaluation_function)
+            % Returns a fitness function evaluating chromosomes fitness by
+            % the car's initial location (according to the given R^2 -> [0,
+            % 1] function)
+            function fitness_value = fitness(chr)
+                [x, y, ~, ~, ~] = chr.get_physical_data();
+                fitness_value = max([0 min([1 location_to_evaluation_function([x; y])])]);
+            end
+            fitness_func = @fitness;
+        end
+        
         function fitnes_func = get_simple(good_fitnes_limit)
             function fitness = fit(chr, varargin)
                 scenario = chr.get_scenario();
