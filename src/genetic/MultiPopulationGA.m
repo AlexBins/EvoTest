@@ -15,7 +15,7 @@ classdef MultiPopulationGA
     
     methods
         function obj = MultiPopulationGA(npop, popsize)
-        % This is the class constuctor
+        % This is the class constructor
         % Get GA Parameters
         ga_params = obj.getGAParams();
         obj.npop = npop;
@@ -89,7 +89,35 @@ classdef MultiPopulationGA
                     mp(idx_source) = []; 
                     end
                     end
-                case 'neigbour'
+                case 'neighbour'
+                    % iterate over all populations
+                    for idx = 1:self.npop
+                    % 1. for each population create migration pool from the
+                    % neighbour (forward and backward) populations
+                    idx_next = mod(idx, self.npop)+1;
+                    idx_prev = mod(idx-2, self.npop)+1;
+                    
+                    % 2. create migration pool using best chromosomes from
+                    % neighbour populations
+                    mp = struct('chr', self.gas(idx_prev).Population.get_best_idx(), 'pop', idx_prev);
+                    mp(2) = struct('chr', self.gas(idx_next).Population.get_best_idx(), 'pop', idx_next);
+                    
+                    % assure enough chromosomes in migration pool
+                    if (m_rate<=length(mp))
+                        % account for migration rate
+                        for m = 1:m_rate
+
+                        % 3. select migrant randomly from migration pool
+                        idx_source = randi(length(mp));
+                        % 4. migrate selected chromosome from pool to current
+                        % population
+                        MultiPopulationGA.migrate(self.gas(idx).Population, self.gas(mp(idx_source).pop).Population, mp(idx_source).chr);
+                        % remove migrated chromosome from migration pool to
+                        % avoid duplicate migrants
+                        mp(idx_source) = []; 
+                        end
+                    end
+                    end
                 otherwise
                     self.log('Invalid migration policy specified');
             end
