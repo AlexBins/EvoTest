@@ -41,6 +41,21 @@ classdef Population < handle
             end
         end
         
+        function best_idx = get_best_idx(self)
+            % Returns index of the chromosome with best(lowest) fitness value
+                current_best_idx = 1;
+                current_best_fitness = 1;
+                for j = 1:length(self.chromosomes)
+                    current_fitness = self.chromosomes(j).fitness;
+                    if (current_fitness < current_best_fitness)
+                        current_best_idx = j;
+                        current_best_fitness = current_fitness;
+                    end
+                end
+                best_idx = current_best_idx;
+        end
+        
+        
         function remove(self, idx)
         % removes a chromosome with a given position index from the
         % population    
