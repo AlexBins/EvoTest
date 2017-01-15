@@ -77,11 +77,17 @@ classdef MultiPopulationGA
                         end    
                     end
                     mp(1) = [];
+                    % account for migration rate
+                    for m = 1:m_rate
                     % 2. select migrant randomly from migration pool
                     idx_source = randi(length(mp));
                     % 3. migrate selected chromosome from pool to current
                     % population
                     MultiPopulationGA.migrate(self.gas(idx).Population, self.gas(mp(idx_source).pop).Population, mp(idx_source).chr);
+                    % remove migrated chromosome from migration pool to
+                    % avoid duplicates
+                    mp(idx_source) = []; 
+                    end
                     end
                 case 'neigbour'
                 otherwise
