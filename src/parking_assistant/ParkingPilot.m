@@ -87,11 +87,12 @@ classdef ParkingPilot < handle
             % location and direction
             if isDirectParkingPossible
                 
-                ParkingPilot.fillWithElements(geometricSequence,...
+                isDirectParkingPossible = ~ParkingPilot.fillWithElements(geometricSequence,...
                     carl, carn, targetl, targetn,...
                     circcar, circtarget, radcar, radtarget,...
                     card, targetd, debug);
-            else % direct parking not possible => get dubin target position
+            end
+            if ~isDirectParkingPossible % direct parking not possible => get dubin target position
                 if targetLeftOfSlot
                     amount = -1;
                 else
@@ -105,9 +106,11 @@ classdef ParkingPilot < handle
                 dubinOrientation = targetOrientation;
                 dubinTarget = circcar + targetn * radcar;
                 
-                ParkingPilot.fillWithElements(geometricSequence,...
+                if ParkingPilot.fillWithElements(geometricSequence,...
                     dubinTarget, -targetn, targetl, targetn, circcar, circtarget,...
-                    radcar, radtarget, targetd, targetd, debug);
+                    radcar, radtarget, targetd, targetd, debug)
+                    isDirectParkingPossible = false;
+                end
                 
                 if debug
                     Utility.drawGS(geometricSequence);
@@ -116,10 +119,12 @@ classdef ParkingPilot < handle
             end
         end
         
-        function fillWithElements(geometricSequence, ...
+        function badEntry = fillWithElements(geometricSequence, ...
                 carl, carn, targetl, targetn,...
                 circcar, circtarget, radcar, radtarget, card, targetd,...
                 debug)
+            
+                badEntry = false;
 
                 entryAngleCar = GeometricUtility.GetAngle(carl - circcar);
                 exitAngleTarget = GeometricUtility.GetAngle(targetl - circtarget);
@@ -132,9 +137,19 @@ classdef ParkingPilot < handle
                 else
                     entryAngleTarget = GeometricUtility.GetAngle(+cartotarget);
                 end
+                
+                if targetl(1) > 0 && entryAngleTarget < pi / 4 && entryAngleTarget > -3 * pi / 4
+                    badEntry = true;
+                elseif targetl(1) < 0 && entryAngleTarget < -pi / 4 && entryAngleTarget > 3 * pi / 4
+                    badEntry = true;
+                end
+                if badEntry
+                    return;
+                end
 
                 dirCar = GeometricUtility.GetShorterDirection(entryAngleCar, exitAngleCar);
-                dirTarget = GeometricUtility.GetShorterDirection(entryAngleTarget, exitAngleTarget);
+                %dirTarget = GeometricUtility.GetShorterDirection(entryAngleTarget, exitAngleTarget);
+                dirTarget = sign(targetl(1));
                 
                 circ1 = PlanCircle(radcar, entryAngleCar, exitAngleCar, dirCar);
                 circ1.PosX = circcar(1);

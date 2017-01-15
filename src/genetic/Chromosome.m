@@ -22,17 +22,19 @@ classdef Chromosome < handle
         end
         
         function [x, y, angle, length, depth] = get_physical_data(self)
+            [length, depth] = Chromosome.get_min_slot_size();
+            
             bit_max = Chromosome.get_max_value();
             x = 15*self.carx/bit_max - 7.5;
             y = 5*self.cary/bit_max - 1;
             angle = 2*pi*self.carangle/bit_max;
-            length = 2.75*self.slotlength/bit_max + 2.25;
-            depth = self.slotdepth/bit_max + 1;
+            length = 2.75*self.slotlength/bit_max + length;
+            depth = self.slotdepth/bit_max + depth;
         end
         
         function scenario = get_scenario(self)
             [x,y,angle,length, depth] = self.get_physical_data();
-            scenario = StaticScenario(x,y,angle,length,depth);
+            scenario = StaticScenario(x,y,angle,length,depth);   
         end
         
         function set_fitnes(self, fitness)
@@ -41,6 +43,11 @@ classdef Chromosome < handle
     end
     
     methods (Static)
+        function [len, dep] = get_min_slot_size()
+            len = 2.25;
+            dep = 1;
+        end
+        
         function chromosome = get_random()
             mav_val = Chromosome.get_max_value();
             chromosome = Chromosome(randi(mav_val)-1,randi(mav_val)-1,randi(mav_val)-1,randi(mav_val)-1,randi(mav_val)-1);
