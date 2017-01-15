@@ -6,9 +6,9 @@ classdef MultiPopulationGA
         
         gas % array of handles for GenericGA objects
         
-        % migration rate (number of chromosomes migrated from one population to another in a single run
+        mr % migration rate (number of chromosomes migrated from one population to another in a single run
         
-        % migration interval (number of epochs passed between two consequent migrations)
+        mi % migration interval (number of epochs passed between two consequent migrations)
         
         ga_params % struct of parameters for genericGA
     end
@@ -66,9 +66,26 @@ classdef MultiPopulationGA
                     
                 end
                 case 'unrestricted'
+                    % iterate over all populations
+                    for idx = 1:self.npop
+                    % 1. for each population create migration pool from the
+                    % rest populations
+                    mp = struct('chr', [], 'pop', []);
+                    for i = 1:self.npop
+                        if (i ~= idx)
+                            mp(end+1) = struct('chr', self.gas(i).Population.get_best_idx(), 'pop', i);
+                        end    
+                    end
+                    mp(1) = [];
+                    % 2. select migrant randomly from migration pool
+                    idx_source = randi(length(mp));
+                    % 3. migrate selected chromosome from pool to current
+                    % population
+                    MultiPopulationGA.migrate(self.gas(idx).Population, self.gas(mp(idx_source).pop).Population, mp(idx_source).chr);
+                    end
                 case 'neigbour'
                 otherwise
-                    self.log('Invalid migration policy');
+                    self.log('Invalid migration policy specified');
             end
             end
         end
@@ -92,7 +109,7 @@ classdef MultiPopulationGA
         % Insert selected chromosome to destination population
             p_dest.insert(p_source.chromosomes(idx_source));
         % Remove chromosome from the source population
-            p_source.remove(idx_source);
+            %p_source.remove(idx_source);
         
         end
         
