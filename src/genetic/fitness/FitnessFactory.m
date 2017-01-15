@@ -4,10 +4,14 @@ classdef FitnessFactory
             % This function returns a complete fitness function, taking
             % care of slot size, collision distance and minimal distance but not the car position (since this differs
             % from Population to Population)
-            function fitness_value = fitness(chr)
+            function fitness_value = fitness(chr, varargin)
                 % Get the scenario. Simulation already complete.
-                scenario = chr.get_scenario();
-                scenario.RunParkingPilot();
+                if isempty(varargin)
+                    scenario = chr.get_scenario();
+                    scenario.RunParkingPilot();
+                else
+                    scenario = varargin{1};
+                end
                 
                 % calculate the slot size multiplier
                 [~, ~, ~, len, dep] = chr.get_physical_data();
@@ -52,7 +56,7 @@ classdef FitnessFactory
             % Returns a fitness function evaluating chromosomes' fitness by
             % the car's initial orientation (according to the given R -> [0,
             % 1] function)function fitness_value = fitness(chr)
-            function fitness_value = fitness(chr)
+            function fitness_value = fitness(chr, varargin)
                 [~, ~, angle, ~, ~] = chr.get_physical_data();
                 fitness_value = max([0 min([1 orientation_to_evaluation_function(angle)])]);
             end
@@ -73,7 +77,7 @@ classdef FitnessFactory
                     value = 1;
                 end
             end
-            fitness_func = get_car_orientation_evaluating(@punish);
+            fitness_func = FitnessFactory.get_car_orientation_evaluating(@punish);
         end
         
         function fitness_func = get_car_location_punishing(line_start_point, line_direction, expecting_left_of_line, punishing_factor)
@@ -81,22 +85,42 @@ classdef FitnessFactory
             % the car's initial location (if the location is on the wrong
             % side of the lane, the punishing factor is applied)
             function value = punish(location)
-                if GeometricUtility.IsLeftOfLine(location, line_start_point, line_direction) == expecting_left_of_line
+                if sign(GeometricUtility.IsLeftOfLine(location, line_start_point, line_direction)) == expecting_left_of_line
                     value = 1;
                 else
                     value = punishing_factor;
                 end
             end
-            fitness_func = get_car_location_evaluating(@punish);
+            fitness_func = FitnessFactory.get_car_location_evaluating(@punish);
         end
         
         function fitness_func = get_car_location_evaluating(location_to_evaluation_function)
             % Returns a fitness function evaluating chromosomes fitness by
             % the car's initial location (according to the given R^2 -> [0,
             % 1] function)
-            function fitness_value = fitness(chr)
+            function fitness_value = fitness(chr, varargin)
                 [x, y, ~, ~, ~] = chr.get_physical_data();
                 fitness_value = max([0 min([1 location_to_evaluation_function([x; y])])]);
+            end
+            fitness_func = @fitness;
+        end
+        
+        function fitness_func = get_collision_enforcing(collision_epsilon)
+            function fitness_value = fitness(chr, varargin)
+                if isempty(varargin)
+                    scenario = chr.get_scenario();
+                    [min_distance, collision] = scenario.RunParkingPilot();
+                else
+                    scenario = varargin{1};
+                    min_distance = scenario.MinDistance;
+                    collision = scenario.Collision;
+                end
+                
+                if ~collision && min_distance > collision_epsilon
+                    fitness_value = 0;
+                else
+                    fitness_value = 1;
+                end
             end
             fitness_func = @fitness;
         end

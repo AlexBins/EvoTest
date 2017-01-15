@@ -17,6 +17,16 @@ classdef Selectors
                 for i = 1:n
                     total_fitness = total_fitness + chromosomes(i).fitness;
                 end
+                if total_fitness == 0
+                    selected = datasample(chromosomes, 1);
+                else
+                    weights = zeros(1, n);
+                    for i = 1:n
+                        weights(i) = chromosomes(i).fitness / total_fitness;
+                    end
+                    selected = datasample(chromosomes, 1, 'Weights', weights);
+                end
+                return;
                 current_fitness = 0;
                 idx = 0;
                 rand_number = rand * total_fitness;
