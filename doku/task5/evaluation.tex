@@ -15,19 +15,22 @@
 
 \section{Multipopulationsalgorithmus}
 Multipopulations-Algorithmen erlauben das parallele Entwickeln von Populationen. Sie können auf verschiedene Ziele ausgerichtet sein. Ein Austausch der Individuen zwischen Populationen soll zu einer Erhöhung der Diversität führen.
-
-\subsection{Architektur}
 Bedingt durch die Notwendigkeit, Populationen als Gesamtheit behandeln und vor allem vermischen zu können, war es notwendig, die zuvor verwendete Implementierung des genetischen Algorithmus anzupassen. 
 
-\subsubsection{Populationsbehandlung}
-Die Verwaltung einer Population wurde in einer Klasse \emph{Population} gekapselt. Sie übernimmt die Erweiterung der Population um neue Chromosome, sowie die Reduktion auf die vorgegeben Populationsgrößen. Auch die Initialisierung der Chromosome wird von der Populationsklasse übernommen.
+\subsection{Populationsbehandlung}
+Die Verwaltung einer Population wurde in einer Klasse \emph{Population} gekapselt. Sie übernimmt die Erweiterung der Population um neue Chromosome, sowie die Reduktion auf die vorgegeben Populationsgrößen. Auch die Initialisierung der Chromosome wird von der Populationsklasse übernommen. Die Reduktion der Chromosomen-Anzahl erfolgt durch aussortieren der \glqq schwächsten\grqq Individuen. Sie zeichnen sich durch die schlechteste Fitness innerhalb der Population aus.
 
 \subsection{Genetischer Algorithmus}
-Die erste Version des genetischen Algorithmus verfügte lediglich über eine Hauptroutine, die die zyklische Evolution der Chromosome vornahm. Um mehrere Algorithmen verwenden und eine Interaktion gewährleisten zu können, musste eine schrittweise Umsetzung der Evolution integriert werden. Aus Gründen der Übersichtlichkeit und Wartbarkeit wurde eine neue Klasse \emph{GenericGA} angelegt. Diese weist zwei Vorteile gegenüber der ersten Implementierung auf. Die Algorithmus-Klasse ist lediglich für die Umsetzung der genetischen Operationen zuständig, sämtliche die Population betreffenden Operationen wie Initialisierung und Reduktion werden in der Populations-Klasse behandelt. Zudem kann die Evolution Schrittweise von einer übergeordneten Kontrollinstanz durchgeführt werden. Damit ergibt sich die Flexibilität, verschiedene Instanzen zu erzeugen, die Populationen zu mischen, und erneut einige Iterationen zu durchlaufen.
+Die erste Version des genetischen Algorithmus verfügte lediglich über eine Hauptroutine, die die zyklische Evolution der Chromosome vornahm. Um mehrere Algorithmen verwenden und eine Interaktion gewährleisten zu können, musste eine schrittweise Umsetzung der Evolution integriert werden. Aus Gründen der Übersichtlichkeit und Wartbarkeit wurde eine neue Klasse \textsf{GenericGA} angelegt. Diese weist zwei Vorteile gegenüber der ersten Implementierung auf. Die Algorithmus-Klasse ist lediglich für die Umsetzung der genetischen Operationen zuständig, sämtliche die Population betreffenden Operationen wie Initialisierung und Reduktion werden in der Populations-Klasse behandelt. Zudem kann die Evolution Schrittweise von einer übergeordneten Kontrollinstanz durchgeführt werden. Damit ergibt sich die Flexibilität, verschiedene Instanzen zu erzeugen, die Populationen zu mischen, und erneut einige Iterationen zu durchlaufen. \\
+Die schrittweise Evolution wird durch die Funktion \begin{quote}
+\textsf{runEpoch(population)}
+\end{quote} gewährleistet. Sie modifiziert Chromosome der übergebenen Population. Dazu werden die Funktionen-Handles der \textsf{GenericGA}-Instanz verwendet, die durch den Konstruktor gesetzt werden müssen. Als problematisch erweist sich die Ermittlung der neuen Fitness-Werte. An sich ist es Sinnvoll, vor jedem Selektionsprozess die Fitnessfunktionen zu berechnen. Damit wäre für einen nächsten Durchlauf die alte Fitness für die Rekombination verfügbar. Leider kann das im Falle von Migrationen zu Problemen führen, da hier Chromosome aus anderen Populationen übernommen werden. Weil die verschiedenen Populationen durch unterschiedliche Fitnessfunktionen geprägt werden, ist nach einer Migration vor einer erneuten Rekombination eine erneute Fitnessberechnung durchzuführen. Die Schnittstelle \textsf{runEpoch} setzt deshalb Populationen mit validen Fitnessinformationen voraus. Dazu kann die Funktion \begin{quote}
+\textsf{computeFitness(population)} \end{quote} einer \textsf{GenericGA}-Instanz verwendet werden. Sie weißt jedem Chromosom die durch die Fitnessfunktion des genetischen Algorithmus bedingte Fitness zu. Sollen mehrere Evolutionsepochen ohne Migration durchlaufen werden, kann die Schnittstelle 
+\begin{quote}
+\textsf{runEpochs(population, iterations)}
+\end{quote} verwendet werden. Sie setzt keine validen Fitness-Informationen voraus.
 
 \subsection{Kontrollinstanz}
-
-\subsection{Implementierung}
 
 \section{Ausgewählte Testfälle}
 \subsection{Gruppierung}
