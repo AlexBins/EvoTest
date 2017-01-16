@@ -66,6 +66,10 @@ classdef Chromosome < handle
             depth = bit_max*(depth-1);
             chr = Chromosome(x, y, angle, length, depth);
         end
+        
+        function chr = copy(prototype)
+            chr = Chromosome(prototype.carx, prototype.cary, prototype.carangle, prototype.slotlength, prototype.slotdepth);
+        end
     end
 end
 
