@@ -93,8 +93,12 @@ classdef FitnessFactory
             % between 0 and 2 * pi and punishing_factor is the fitness
             % value multiplied with, if the actual angle is outside of
             % this range)
+            
+            min_angle = mod(min_angle, 2 * pi);
+            max_angle = mod(max_angle, 2 * pi);
+            
             function value = punish(angle)
-                angle = mod(angle + 2 * pi, 2 * pi);
+                angle = mod(angle, 2 * pi);
                 if min_angle > angle || max_angle < angle
                     value = punishing_factor;
                 else
