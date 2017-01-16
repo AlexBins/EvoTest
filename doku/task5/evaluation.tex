@@ -31,6 +31,12 @@ Die schrittweise Evolution wird durch die Funktion \begin{quote}
 \end{quote} verwendet werden. Sie setzt keine validen Fitness-Informationen voraus.
 
 \subsection{Kontrollinstanz}
+Die Kontrollinstanz koordiniert die Ausführung der einzelnen genetischen Algorithmen. Die Initialisierung erfolgt lediglich mit der vorgesehenen Größe der Population. Die Klasse \textsf{MultiPopulationGA} enthält die Funktionen
+\begin{quote}
+\textsf{addPopulation(fitness\_handle)} sowie \\
+\textsf{runMPGA(migrations\_rate, epochs\_between\_migrations, migration\_cycles, policy)}
+\end{quote}
+Erstere dient dem konfigurieren der genetischen Algorithmen -- hier kann eine besondere Fitnessfunktion übergeben werden -- die zweite Funktion dient der Evolution der Populationen. Die Abarbeitung kann durch die Parameter eingestellt werden. Die Migrationsrate entspricht der Anzahl der Chromosome, die in jeder Population getauscht werden sollen. Zudem kann die Anzahl Epochen zwischen Migrationsvorgängen und die Anzahl an Migrationsvorgängen festgelegt werden. Der Parameter \textsf{policy} dient dem Wechsel zwischen Ring-, Nachbar- und uneingeschränkter Migration.
 
 \section{Ausgewählte Testfälle}
 \subsection{Gruppierung}
