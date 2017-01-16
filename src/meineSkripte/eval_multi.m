@@ -1,9 +1,9 @@
 function eval_multi(ga_instanz)
     hold on;
     pops = ga_instanz.pops;
-    colors = ['r-'; 'b-'; 'g-'; 'y-'; 'c-'; 'k-'; 'm-'];
+    colors = ['r'; 'b'; 'g'; 'y'; 'c'; 'k'; 'm'];
     for i = 1:length(pops)
-        fprintf('\n\nPloting a new Population (%s) \n', colors(i));
+        fprintf('\n\nPloting a new Population\n');
         tcs = extract_tcs(pops(i).chromosomes);
         plot_tcs(tcs, colors(mod(i,7)+1));
         fprintf('Collecting information:\n');
