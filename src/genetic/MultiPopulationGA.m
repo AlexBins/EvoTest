@@ -145,10 +145,13 @@ classdef MultiPopulationGA < handle
                     otherwise
                         self.log('Invalid migration policy specified');
                 end
+                
+            end
+            for i = 1:length(self.gas)
+                ga = self.gas(i);
+                ga.computeFitness(self.pops(i));
             end
         end
-        
-       
     end
     methods (Static)
          function migrate(p_dest, p_source, idx_source)
