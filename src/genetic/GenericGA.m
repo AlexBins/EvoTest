@@ -1,4 +1,4 @@
-classdef GenericGA
+classdef GenericGA < handle
     properties
         % The reproduction rate
         % 0 => not a single new candidate per epoch
