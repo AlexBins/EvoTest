@@ -28,7 +28,7 @@ for i = 1:size(chrs, 1)
     for j = 1:size(chrs,2)
         [x, y, angle, ~, ~] = chrs(i, j).get_physical_data();
         quiver(x, y, cos(angle), sin(angle), 'Color', colors(j));
-        
+        continue;
         sc = chrs(i, j).get_scenario();
         sc.RunParkingPilot();
         sc.Replay(0.1, 3);

@@ -27,7 +27,7 @@ classdef MultiPopulationGA < handle
             obj.gas = GenericGA.empty;
         end
         
-        function addPopulation(self, varargin)
+        function pop = addPopulation(self, varargin)
             % Adds a new population
             % 
             % arg1: fitness function. (optional)
