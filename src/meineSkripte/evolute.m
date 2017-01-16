@@ -15,7 +15,7 @@ function population = evolute(pop_size, new_pop, max_epochs, verbose)
     merger = MergeFactory.get_generic(Merges.get_naiverandommerge());
 
     gen = GenericGA(new_pop, fit, select, merger, mutator);
-    gen.verbose = true;
+    gen.verbose = verbose;
     population = Population(pop_size);
     gen.runEpochs(population, max_epochs);
 end
