@@ -1,5 +1,29 @@
 classdef FitnessFactory    
     methods(Static)
+        function fitness_func = get_distance_to_trajectory()
+            function fitness_value = fitness(chr, varargin)
+                % Get the scenario. Simulation already complete.
+                if isempty(varargin)
+                    scenario = chr.get_scenario();
+                    scenario.RunParkingPilot();
+                else
+                    scenario = varargin{1};
+                end
+                
+                pl = [scenario.parkingSlot.GetX(); scenario.parkingSlot.GetY()];
+                cl = zeros(2, 1);
+                [cl(1), cl(2), ~, ~, ~] = chr.get_physical_data();
+                distance = norm(pl - cl);
+                
+                dst = 0;
+                for i = 2:length(scenario.Trajectory.Locations)
+                    dst = dst + norm(scenario.Trajectory.Locations(i - 1) - scenario.Trajectory.Locations(i));
+                end
+                fitness_value = 2 * distance / dst;
+            end
+            fitness_func = @fitness;
+        end
+        
         function fitness_func = get_complete()
             % This function returns a complete fitness function, taking
             % care of slot size, collision distance and minimal distance but not the car position (since this differs
