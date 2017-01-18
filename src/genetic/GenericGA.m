@@ -51,10 +51,10 @@ classdef GenericGA < handle
 
         function runEpochs(self, population, iterations)
             % Runs iterations epochs on a given population
-            self.log('Started iteration segment');
+            self.log(sprintf('computing %d epochs at once', iterations));
             self.computeFitness(population);
             for i = 1:iterations
-                self.log(sprintf('Iteration-Counter: %i/%i', i, iterations));
+                self.log(sprintf('evoluting epoch: %i/%i', i, iterations));
                 self.runEpoch(population);
             end
         end
@@ -64,9 +64,9 @@ classdef GenericGA < handle
         % Run one epoch of the GA
         % The population-argument must provide valid fitnes values
             self.log('started a new epoch');
-            number_of_new_chromosomes = length(population.chromosomes) * self.ReproductionRate;
+            number_of_new_chromosomes = round(length(population.chromosomes) * self.ReproductionRate);
             
-            self.log(sprintf('computing %i new chromosomes', number_of_new_chromosomes));
+            self.log(sprintf('computing %d new chromosome(s)', number_of_new_chromosomes));
             new_population = Chromosome.empty;
             
             for idx = 1:number_of_new_chromosomes

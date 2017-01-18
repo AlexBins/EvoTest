@@ -13,6 +13,8 @@ classdef MultiPopulationGA < handle
         defaultPopulationSize
         
         ga_params % struct of parameters for genericGA
+        
+        verbose = false;
     end
     
     methods
@@ -25,6 +27,13 @@ classdef MultiPopulationGA < handle
             % Generate array with populations and GAs
             obj.pops = Population.empty;
             obj.gas = GenericGA.empty;
+        end
+        
+        function enable_logging(self, enabled)
+            self.verbose = enabled;
+            for i = 1:length(self.gas)
+                self.gas(i).verbose = enabled;
+            end
         end
         
         function pop = addPopulation(self, varargin)
@@ -61,13 +70,16 @@ classdef MultiPopulationGA < handle
             % m_rate - migration rate
             % m_int - migration interval
             % n_int - number of intervals
-            
+            self.log('Started Multipopulation evolution');
             % Perform evolution and migration cycles for n_int intervals
             for e = 1:n_int
+                self.log(sprintf('starting a new migration-free interval %d/%d', e, n_int));
                 % Run all GAs for m_int epochs
                 for i=1:self.npop
+                    self.log(sprintf('started a new evolution step for population %d/%d', i, self.npop));
                     self.gas(i).runEpochs(self.gas(i).Population, m_int);
                 end
+                self.log('starting migration');
                 % Migrate
                 % migration policy
                 switch m_policy
@@ -145,11 +157,19 @@ classdef MultiPopulationGA < handle
                     otherwise
                         self.log('Invalid migration policy specified');
                 end
-                
+                self.log('migration done');
             end
+            self.log('evolution done, computing fitnes one last time');
             for i = 1:length(self.gas)
                 ga = self.gas(i);
                 ga.computeFitness(self.pops(i));
+            end
+            self.log('done');
+        end
+        
+        function log(self, msg)
+            if self.verbose
+                fprintf('%s|MPA|%s\n', datetime('now'), msg);
             end
         end
     end
