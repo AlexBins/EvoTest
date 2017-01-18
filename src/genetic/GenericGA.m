@@ -90,6 +90,7 @@ classdef GenericGA < handle
                 fitness = self.FitnessFunction(population.chromosomes(i));
                 population.chromosomes(i).fitness = fitness;
             end
+            population.log_fitness();
         end
     end
     

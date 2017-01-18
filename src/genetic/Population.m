@@ -3,6 +3,7 @@ classdef Population < handle
     properties
         chromosomes;
         size;
+        fitness_log = [];
     end
     
     methods
@@ -13,6 +14,15 @@ classdef Population < handle
                 chr = Chromosome.get_random();
                 population.add(chr);
             end
+        end
+        
+        function log_fitness(self)
+            sum = 0;
+            chr_count = length(self.chromosomes);
+            for i = 1:chr_count
+                sum = sum + self.chromosomes(i).fitness;
+            end
+            self.fitness_log(length(self.fitness_log)+1) = sum / chr_count;
         end
         
         function add(self, chromosome)
