@@ -39,12 +39,37 @@ Die Kontrollinstanz koordiniert die Ausführung der einzelnen genetischen Algori
 Erstere dient dem konfigurieren der genetischen Algorithmen -- hier kann eine besondere Fitnessfunktion übergeben werden -- die zweite Funktion dient der Evolution der Populationen. Die Abarbeitung kann durch die Parameter eingestellt werden. Die Migrationsrate entspricht der Anzahl der Chromosome, die in jeder Population getauscht werden sollen. Zudem kann die Anzahl Epochen zwischen Migrationsvorgängen und die Anzahl an Migrationsvorgängen festgelegt werden. Der Parameter \textsf{policy} dient dem Wechsel zwischen Ring-, Nachbar- und uneingeschränkter Migration.
 
 \section{Ausgewählte Testfälle}
+Zur Definition der einzelnen Populationen für den genetischen Algorithmus wurden Äquivalenzklassen der Testfälle analytisch hergeleitet.
 \subsection{Gruppierung}
+Die Anzahl der Äquivalenzklassen für die gesuchten Testfälle wird durch Kombination von Fahrzeugposition im Verhältnis zur Parklücke (left/right) sowie von Fahrzeugausrichtung (up/down/left/right) bestimmt. Somit ergeben sich acht Gruppen der gesuchten Testfälle.
 \subsection{Dedizierte Fitnessfunktionen}
-
+Für jede Äquivalenzklasse wurde eine Fitnessfunktion so definiert, dass die Testfälle mit gesuchten Eigenschaften innerhalb einer Population eine höhere Wertung erhalten. Somit wird der Selektionsdruck vom genetischen Algorithmus in eine für gegebenen Population gewünschte Richtung geleitet. Die Testfälle, die von den gewünschten Eigenschaften stark abweichen werden dagegen mit einem schlechten Wert der Fitnessfunktion bestraft und folglich aussortiert.
 \section{Bewertung}
-\subsection{Eignung der Fitness-Funktionen}
-\subsection{Konvergenz der Populationen}
-\subsection{Erfolg der Migrationen}
+Die Ergebnisse vom genetischen Algorithmus mit mehreren Populationen weisen eine hohe Heterogenität im Vergleich zu einem einfachen genetischen Ansatz. Für jede Population wird der Selektionsdruck und somit auch die Konvergenz der gesuchten Testfälle mittels angepassten Fitnessfunktionen gesteuert.
+\begin{figure}\centering
+\includegraphics[width=.6\textwidth]{mpga_nomigration.jpg}
+\caption{Visualisierung der Testfälle: MPGA ohne Migration}
+\label{fig:mpganomig}
+\includegraphics[width=.6\textwidth]{mpga_ring.jpg}
+\caption{Visualisierung der Testfälle: MPGA Ring Migration}
+\label{fig:mpgaring}
+\includegraphics[width=.6\textwidth]{mpga_unrestricted.jpg}
+\caption{Visualisierung der Testfälle: MPGA Unrestricted Migration}
+\label{fig:mpgaunrest}
 
+\end{figure}
+
+
+
+\subsection{Eignung der Fitness-Funktionen}
+Die Ergebnisse vom genetischen Algorithmus für acht  Populationen zeigen, dass die jeweiligen Fitnessfunktionen die Evolution der Testfälle in die gewünschte Richtung treiben. 
+\subsection{Konvergenz der Populationen}
+Die Konvergenz der Testfälle in der Populationen wird durch die verwendete Fitnessfunktion gesteuert. Durch eine hohe Bewertung der Testfälle mit gewünschten vorprogrammierten Eigenschaften bzw. durch Abwertung der unpassenden Testfälle konvergieren die Chromosome mit steigender Anzahl der Epochen zunehmend.
+\subsection{Einfluss der Migrationen}
+Für die Migration der Chromosome zwischen den Populationen wurden die 'ring', 'unrestricted' sowie die 'neighbour' Methode verwendet. Wie aus dem Vergleich der Ergebnisse ohne Migration ersichtlich hat Einsatz der genannten Migrationsmethoden positiv zur Erhöhung der Heterogenität der Testfälle innerhalb der Populationen beigetragen.
+\begin{figure}\centering
+\includegraphics[width=.6\textwidth]{mpga_neighbour.jpg}
+\caption{Visualisierung der Testfälle: MPGA Neighbour Migration}
+\end{figure}
+\label{fig:mpganeihb}
 \end{document}
