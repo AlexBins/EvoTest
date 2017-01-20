@@ -114,7 +114,7 @@ classdef GeometricUtility
             handle = plot(X, Y, style);
         end
         
-        function [ x, y, r ] = getCircle( mx, my, mr, sx, sy, su, sv, lambda_start )
+        function [ x, y, r ] = getCircle_deprecated( mx, my, mr, sx, sy, su, sv, lambda_start )
 
             % getcircle: enhances the location of the circle on the line defined by
             % (sx, sy)^T + lambda * (su, sv)^T so that the circle around (sx, sy)^T
@@ -155,6 +155,105 @@ classdef GeometricUtility
 
                 l = l + mod * off;
             end
+        end
+        
+        function [ x, y, r ] = getCircle( car_l, car_d, target_l, target_d, min_r )
+            % Algorithm based on the equations for the car normal line,
+            % which must contain the car turning circle's center and the
+            % distance equations. The crcl_target_l / ..._r variables represent
+            % the target turning circle location and radius
+            % p(lmb) = a + d * lmb
+            % | p(lmb) - x | = lmb - r;
+            % with a = car_l, d = car_n, x = crcl_target-l and r =
+            % crcl_target_r
+            % 
+            
+            car_d = car_d / norm(car_d);
+            target_d = target_d / norm(target_d);
+            
+            car_n = GeometricUtility.turn2DVec(car_d, pi / 2);
+            target_n = GeometricUtility.turn2DVec(target_d, pi / 2);
+            
+            crcl_target_r = min_r;
+            crcl_target_l = target_l + target_n * crcl_target_r;
+            
+            % > 0 => left, 0 => on, < 0 => right
+            sgn_target_is_left_of_car = GeometricUtility.IsLeftOfLine(crcl_target_l, car_l, car_d);
+            if sgn_target_is_left_of_car >= 0
+                % this side contains both cases: the car turning circle is
+                % including the target turning circle and also the case,
+                % that the car needs to drive backwards in a line.
+                [car_line_to_target, lmb] = GeometricUtility.PointToLine(car_l, car_d, crcl_target_l);
+                dt = dot(car_line_to_target, car_line_to_target);
+                Rs = crcl_target_r * crcl_target_r;
+                if dt > Rs
+                    including = true;
+                elseif dt == Rs
+                    % Car should drive to the target turning circle in a
+                    % line. Simulate this by creating a huge circle in a
+                    % way, that the car's orientation changes by only 0.5
+                    % degrees:
+                    r = abs(lmb);
+                    crcl_car_l = car_l + r * car_n;
+                    x = crcl_car_l(1);
+                    y = crcl_car_l(2);
+                    return;
+                else
+                    including = false;
+                end
+            else
+                including = false;
+            end
+            
+            % Now we know if we have to create a circle that includes the
+            % target turning circle or one, that touches it.
+            if ~including
+                % Turn the normal around. This is neccessary, because only
+                % in an including case the car turning circle may be driven
+                % with the same steering angle sign as the target turning
+                % circle (otherwise the car reaches the target location
+                % facing the opposite of the desired way)
+                car_n = -car_n;
+            end
+            
+            % substitution parameter to save execution time
+            ny = car_l - crcl_target_l;
+            % This sign is needed since the target turning circle touches
+            % the including circle from the inside and the touching circle
+            % from the outside. Thus the including one needs a bigger
+            % radius than the touching one.
+            if including
+                m_sgn = +1;
+            else
+                m_sgn = -1;
+            end
+            % Equation parameter for equation c_ + b_ * lmb = 0
+            b_ = 2 * ny(1) * car_n(1) + 2 * ny(2) * car_n(2) + m_sgn * 2 * crcl_target_r;
+            c_ = ny(1) ^ 2 + ny(2) ^ 2 - crcl_target_r ^ 2;
+            
+            lmb = - c_ / b_;
+            
+            % The point given by car_l + car_n * lmb now is the center of
+            % the car turning circle. Thus the radius is lmb (normed car_n)
+            % and the location is car_l + car_n * lmb
+            r = lmb;
+            loc = car_l + car_n * lmb;
+            x = loc(1);
+            y = loc(2);
+        end
+
+        function [vec, t] = PointToLine(line_start, line_direction, location)
+            a = line_direction;
+            b = location - line_start;
+            t = dot(a, b) / dot(a, a);
+            target = line_start + t * line_direction;
+            vec = location - target;
+        end
+
+        function result = IsLeftOfLine(pnt, line_start, line_direction)
+            a = line_direction;
+            b = pnt - line_start;
+            result = a(1) * b(2) - b(1) * a(2);
         end
 
         function dist = distance(mx, my, sx, sy, su, sv, lambda)

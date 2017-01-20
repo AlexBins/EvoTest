@@ -46,10 +46,8 @@ classdef Trajectory < handle
                 y = self.Locations(1, 2);
                 angle = self.Angles(1);
             else
-                i = 1;
-                while length(self.Timestamps) > i && self.Timestamps(i + 1) < time
-                    i = i + 1;
-                end
+                i = find(self.Timestamps < time, 1, 'last');
+                
                 t0 = self.Timestamps(i);
                 t1 = self.Timestamps(i + 1);
                 x0 = self.Locations(i,1);

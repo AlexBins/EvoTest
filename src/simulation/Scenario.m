@@ -9,6 +9,9 @@ classdef Scenario < handle
         CarStartInformation
         Collision
         MinDistance
+        MinDistanceTime
+        
+        %dbg_distance
     end
     
     methods
@@ -45,6 +48,8 @@ classdef Scenario < handle
             
             self.Trajectory.LogCar(self.Car, 0);
             
+            time = self.Trajectory.GetDuration();
+            
             % iterate over the control matrix
             for idx=1:size(control_matrix, 1)
                 
@@ -55,7 +60,7 @@ classdef Scenario < handle
                 steering_angle = ctr_vector(2);
                 duration = ctr_vector(3);
                 % Calculate the maximum possible dt
-                max_dt = 0.5 / abs(velocity);
+                max_dt = 0.25 / abs(velocity);
                 % Get the amount the maximum possible dt would be needed to
                 % run the current control vector
                 n = duration / max_dt;
@@ -72,34 +77,43 @@ classdef Scenario < handle
                     end
                     % move the car according to the provided information
                     self.Car.Move(velocity, steering_angle, dt);
+                    time = time + dt;
                     
                     % Check for collision
-                    self.UpdateCollisionState();
+                    if self.UpdateCollisionState()
+                        self.MinDistanceTime = time;
+                    end
                     
                     % Log the new positions
                     self.Trajectory.LogCar(self.Car, dt);
                 end
             end
-            
-            
         end
         
-        function UpdateCollisionState(self)
-                    
+        function min_distance_set = UpdateCollisionState(self)
+            min_distance_set = false;
             car_rect = self.Car.GetRectangle();
+            %n = size(self.dbg_distance, 1);
             for iElement = 1:length(self.World.RElements)
                 i_rect = self.World.RElements(iElement).GetRectangle();
 
                 [doCollide, distance] = GeometricUtility.fRectDist(car_rect, i_rect);
+                
+                %self.dbg_distance(n + 1, iElement) = distance;
 
                 if doCollide == 1
                     self.Collision = true;
+                    min_distance_set = true;
                 end
                 if isnan(self.MinDistance)
                     self.MinDistance = distance;
+                    min_distance_set = true;
                 elseif (~isnan(distance))
                     if (distance < self.MinDistance)
                         self.MinDistance = distance;
+                        min_distance_set = true;
+                    elseif distance == self.MinDistance
+                        min_distance_set = true;
                     end
                 end
             end
@@ -122,6 +136,9 @@ classdef Scenario < handle
                 time = self.Trajectory.GetDuration();
                 self.DisplayScenario(time);
             else
+                if length(time) ~= 1
+                    pause(1);
+                end
                 [x, y, a] = self.Trajectory.GetAtTime(time);
                 %x = self.CarStartInformation(1) + x;
                 %y = self.CarStartInformation(2) + y;
