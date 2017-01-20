@@ -61,68 +61,22 @@ classdef ParkingPilot < handle
             end
             % calculate the car turning circle necessary for direct parking
             % (touching the target circle)
-            % the center is the intersection of the line through the car
-            % location in direction of the car normal AND the orthogonal
-            % line through the middle of the car location and the closest
-            % point on the target circle.
-            % Correction: the calculated point is close to correct, but not
-            % completly. Thus after that, there is an iterative algorithm
-            % looking for the actual point since the analytic approach is
-            % too complicated
             if norm(circtarget - carl) > minRadius
-                cartotargetcircle = circtarget - carl;
-                closestpointontargetcircle = carl + cartotargetcircle - cartotargetcircle / norm(cartotargetcircle) * radtarget;
-                orthogonaldirectionp = cross([cartotargetcircle; 0], upordown);
-                orthogonaldirection = [orthogonaldirectionp(1); orthogonaldirectionp(2)];
-                orthogonalstart = (closestpointontargetcircle + carl) / 2;
-                orthogonalline = cross(GeometricUtility.PointToProj(orthogonalstart), GeometricUtility.PointToProj(orthogonalstart + orthogonaldirection));
-                carline = cross(GeometricUtility.PointToProj(carl), GeometricUtility.PointToProj(carl + carn));
-                circcarp = cross(carline, orthogonalline);
+                
+                [tmpx, tmpy, radcar] = GeometricUtility.getCircle(carl, card, targetl, targetd, minRadius);
+                circcar = [tmpx; tmpy];
 
                 if debug
-                    plot([carl(1) circtarget(1)], [carl(2) circtarget(2)], 'b:');
-                    plot(closestpointontargetcircle(1), closestpointontargetcircle(2), 'bx');
-                    quiver(orthogonalstart(1), orthogonalstart(2), orthogonaldirection(1) / norm(orthogonaldirection), orthogonaldirection(2) / norm(orthogonaldirection), 'Color', 'b');
+                    plot(circcar(1), circcar(2), 'bx');
+                    viscircles([circcar(1) circcar(2)], radcar, 'Color', 'b');
                 end
 
-
-                % transform the point from projective geometry to normal
-                % 2D geometry
-                circcar = GeometricUtility.PointFromProj(circcarp);
-
-                if debug
-                    plot(circcar(1), circcar(2), 'rx');
-                end
-
-                % iterative enhancement
-                vectocross = circcar - carl;
-                lambda = norm(vectocross) / norm(carn);
-                % If the intersection lies "behind" the car location
-                % (perspective: looking in carn direction)
-                if sign(vectocross(1)) == sign(carn(1))
-                    [tmpx, tmpy, tmpr] = GeometricUtility.getCircle(circtarget(1), circtarget(2), radtarget,...
-                        carl(1), carl(2), carn(1), carn(2), lambda);
-                    circcar = [tmpx; tmpy];
-                    radcar = tmpr;
-
-                    if debug
-                        plot(circcar(1), circcar(2), 'bx');
-                        viscircles([circcar(1) circcar(2)], radcar, 'Color', 'b');
-                    end
-                    % the radius of the turning circle at the car is the distance
-                    % between the target circle center and the car circle center
-                    % minus the target circle radius
-                    %radcar = norm(circcar - carl);
-
-                    % directparking is only possible if the radius is at least the
-                    % minimum turning circle's radius
-                    if radcar < minRadius
-                        isDirectParkingPossible = false;
-                    else
-                        isDirectParkingPossible = true;
-                    end
-                else
+                % directparking is only possible if the radius is at least the
+                % minimum turning circle's radius
+                if radcar < minRadius
                     isDirectParkingPossible = false;
+                else
+                    isDirectParkingPossible = true;
                 end
             else
                 isDirectParkingPossible = false;
@@ -133,11 +87,12 @@ classdef ParkingPilot < handle
             % location and direction
             if isDirectParkingPossible
                 
-                ParkingPilot.fillWithElements(geometricSequence,...
+                isDirectParkingPossible = ~ParkingPilot.fillWithElements(geometricSequence,...
                     carl, carn, targetl, targetn,...
                     circcar, circtarget, radcar, radtarget,...
                     card, targetd, debug);
-            else % direct parking not possible => get dubin target position
+            end
+            if ~isDirectParkingPossible % direct parking not possible => get dubin target position
                 if targetLeftOfSlot
                     amount = -1;
                 else
@@ -151,9 +106,11 @@ classdef ParkingPilot < handle
                 dubinOrientation = targetOrientation;
                 dubinTarget = circcar + targetn * radcar;
                 
-                ParkingPilot.fillWithElements(geometricSequence,...
+                if ParkingPilot.fillWithElements(geometricSequence,...
                     dubinTarget, -targetn, targetl, targetn, circcar, circtarget,...
-                    radcar, radtarget, targetd, targetd, debug);
+                    radcar, radtarget, targetd, targetd, debug)
+                    isDirectParkingPossible = false;
+                end
                 
                 if debug
                     Utility.drawGS(geometricSequence);
@@ -162,10 +119,12 @@ classdef ParkingPilot < handle
             end
         end
         
-        function fillWithElements(geometricSequence, ...
+        function badEntry = fillWithElements(geometricSequence, ...
                 carl, carn, targetl, targetn,...
                 circcar, circtarget, radcar, radtarget, card, targetd,...
                 debug)
+            
+                badEntry = false;
 
                 entryAngleCar = GeometricUtility.GetAngle(carl - circcar);
                 exitAngleTarget = GeometricUtility.GetAngle(targetl - circtarget);
@@ -173,10 +132,24 @@ classdef ParkingPilot < handle
                 cartotarget = circtarget - circcar;
                 
                 exitAngleCar = GeometricUtility.GetAngle(cartotarget);
-                entryAngleTarget = GeometricUtility.GetAngle(-cartotarget);
+                if dot(cartotarget, cartotarget) > radcar ^ 2
+                    entryAngleTarget = GeometricUtility.GetAngle(-cartotarget);
+                else
+                    entryAngleTarget = GeometricUtility.GetAngle(+cartotarget);
+                end
+                
+                if targetl(1) > 0 && entryAngleTarget < pi / 4 && entryAngleTarget > -3 * pi / 4
+                    badEntry = true;
+                elseif targetl(1) < 0 && entryAngleTarget < -pi / 4 && entryAngleTarget > 3 * pi / 4
+                    badEntry = true;
+                end
+                if badEntry
+                    return;
+                end
 
                 dirCar = GeometricUtility.GetShorterDirection(entryAngleCar, exitAngleCar);
-                dirTarget = GeometricUtility.GetShorterDirection(entryAngleTarget, exitAngleTarget);
+                %dirTarget = GeometricUtility.GetShorterDirection(entryAngleTarget, exitAngleTarget);
+                dirTarget = sign(targetl(1));
                 
                 circ1 = PlanCircle(radcar, entryAngleCar, exitAngleCar, dirCar);
                 circ1.PosX = circcar(1);

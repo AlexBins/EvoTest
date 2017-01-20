@@ -83,9 +83,9 @@ classdef GeneticAlgorithm < handle
             % Calculate each candidate's fitness
             for i = 1:self.PopulationSize
                 % TODO: Assume struct.Fitness exists
-                self.Population(i).fitnes =...
+                self.Population(i).fitness =...
                     self.FitnessFunction(self.Population(i));
-                self.max_fitnes = max(self.max_fitnes, self.Population(i).fitnes);
+                self.max_fitnes = max(self.max_fitnes, self.Population(i).fitness);
             end
             end_time()
             
@@ -102,7 +102,7 @@ classdef GeneticAlgorithm < handle
                 prnt('creating', nNewCandidatesPerEpoch, 'new candidates');
                 start_time();
                 
-                nPop = Cromosome.empty;
+                nPop = Chromosome.empty;
                 for i = 1:self.PopulationSize % nNewCandidatesPerEpoch
                     parent1 = self.SelectCandidateFunction(self.Population);
                     parent2 = self.SelectCandidateFunction(self.Population);
@@ -111,8 +111,8 @@ classdef GeneticAlgorithm < handle
                     newCandidate = self.MutateFunction(newCandidate);
                     
                     if self.Epoch <= MaxEpoch * perc_replace                
-                        newCandidate.fitnes = self.FitnessFunction(newCandidate);
-                        self.max_fitnes = max(self.max_fitnes, newCandidate.fitnes);
+                        newCandidate.fitness = self.FitnessFunction(newCandidate);
+                        self.max_fitnes = max(self.max_fitnes, newCandidate.fitness);
                         nPop(i) = newCandidate;                    
                     else                    
                         self.AddToPopulation(newCandidate);
@@ -132,9 +132,9 @@ classdef GeneticAlgorithm < handle
         function Initialize(self)
             % TODO: implement restrictions to ensure scenario plausibility
             N = self.PopulationSize;
-            self.Population = Cromosome.empty;
+            self.Population = Chromosome.empty;
                 
-            mv = Cromosome.get_max_value();
+            mv = Chromosome.get_max_value();
             for i = 1:N
                 x = rand;
                 y = rand;
@@ -148,7 +148,7 @@ classdef GeneticAlgorithm < handle
                 length = length * mv;
                 depth = depth * mv;
                 
-                self.Population(i) = Cromosome(x, y,angle, length, depth);
+                self.Population(i) = Chromosome(x, y,angle, length, depth);
             end
         end
         
@@ -156,8 +156,8 @@ classdef GeneticAlgorithm < handle
             % Set the value first, then add it to the population (If the
             % Fitness is set second, then it will be lost due to candidate
             % not inheriting from handle)
-            candidate.fitnes = self.FitnessFunction(candidate);
-            self.max_fitnes = max(self.max_fitnes, candidate.fitnes);
+            candidate.fitness = self.FitnessFunction(candidate);
+            self.max_fitnes = max(self.max_fitnes, candidate.fitness);
             self.Population(length(self.Population) + 1) = candidate;
         end
         
@@ -166,7 +166,7 @@ classdef GeneticAlgorithm < handle
             fitness_values = zeros(n, 1);
             % Collect all fitness values
             for i = 1:n
-                fitness_values(i) = self.Population(i).fitnes;
+                fitness_values(i) = self.Population(i).fitness;
             end
             % I(i) returns the index of the fitness_values(i)-th according
             % chromosome

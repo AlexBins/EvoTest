@@ -32,6 +32,7 @@ classdef RectangularElement < Element
             rot = GeometricUtility.CreateRotation(self.GetOrientationRadians());
             rect = tlout * rot * tlin * rect;
             self.plot_handle = fill(rect(1,:), rect(2,:), color);
+            
         end
         
         function rect = GetRectangle(self)

@@ -26,7 +26,7 @@ classdef Merges
                     else
                         s = c2;
                     end
-                    merged = Cromosome(p.carx, p.cary, a.carangle, s.slotlength, s.slotdepth);
+                    merged = Chromosome(p.carx, p.cary, a.carangle, s.slotlength, s.slotdepth);
             end
             merge_handle = @merge;
         end
@@ -41,7 +41,7 @@ classdef Merges
                     end
                 end
                 
-                merged = Cromosome(...
+                merged = Chromosome(...
                     get_random(c1.carx, c2.carx),...
                     get_random(c1.cary, c2.cary),...
                     get_random(c1.carangle, c2.carangle),...
