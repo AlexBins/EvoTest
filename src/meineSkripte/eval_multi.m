@@ -1,7 +1,9 @@
 function eval_multi(ga_instanz)
-    hold on;
     pops = ga_instanz.pops;
     colors = ['r'; 'b'; 'g'; 'y'; 'c'; 'k'; 'm'];
+    
+    figure(1);
+    hold on;
     for i = 1:length(pops)
         fprintf('\n\nPloting a new Population\n');
         tcs = extract_tcs(pops(i).chromosomes);
@@ -9,6 +11,20 @@ function eval_multi(ga_instanz)
         fprintf('Collecting information:\n');
         evaluate_tcs(tcs);
     end
+    title('Start configuration for testcases');
+    xlabel('x-Position');
+    ylabel('y-Position');
+    
+    figure(2);
+    hold on;
+    for i = 1:length(pops)
+        plot(pops(i).fitness_log);
+    end
+    title('Fitness evolution');
+    xlabel('Generations');
+    ylabel('Average fitness');
+    legend('Population 1','Population 2','Population 3','Population 4','Population 5','Population 6','Population 7','Population 8');
+    
 end
 
 function plot_tcs(testcases, color)
