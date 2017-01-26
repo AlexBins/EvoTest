@@ -72,99 +72,116 @@ classdef MultiPopulationGA < handle
             % n_int - number of intervals
             self.log('Started Multipopulation evolution');
             % Perform evolution and migration cycles for n_int intervals
-            for e = 1:n_int
-                self.log(sprintf('starting a new migration-free interval %d/%d', e, n_int));
-                % Run all GAs for m_int epochs
-                for i=1:self.npop
-                    self.log(sprintf('started a new evolution step for population %d/%d', i, self.npop));
-                    self.gas(i).runEpochs(self.gas(i).Population, m_int);
+            self.evolute(1, n_int, m_int);
+            for e = 2:n_int
+                self.apply_migration(m_policy, m_rate);
+                self.evolute(e, n_int, m_int);
+            end
+            self.log('done with multipopulation evolution');
+        end
+        
+        function migration_unrestricted(self, m_rate)
+            % iterate over all populations
+            for idx = 1:self.npop
+                % 1. for each population create migration pool from the
+                % rest populations
+                mp = struct('chr', [], 'pop', []);
+                for i = 1:self.npop
+                    if (i ~= idx)
+                        mp(end+1) = struct('chr', self.gas(i).Population.get_best_idx(), 'pop', i);
+                    end    
                 end
-                self.log('starting migration');
-                % Migrate
-                % migration policy
-                switch m_policy
-                    case 'ring'
-                    % migrate to the next neighbor clockwise  
+                mp(1) = [];
+                % account for migration rate
+                for m = 1:m_rate
+                    % 2. select migrant randomly from migration pool
+                    idx_source = randi(length(mp));
+                    % 3. migrate selected chromosome from pool to current
+                    % population
+                    MultiPopulationGA.migrate(self.gas(idx).Population, self.gas(mp(idx_source).pop).Population, mp(idx_source).chr);
+                    % remove migrated chromosome from migration pool to
+                    % avoid duplicates
+                    mp(idx_source) = []; 
+                end
+            end
+        end
+        
+        function migration_ring(self, m_rate)
+            % migrate to the next neighbor clockwise
+            for idx = 1:self.npop
+                idx_next = mod(idx, self.npop)+1;
+                %nrand = NaN;
+                % apply migration rate
+                for migrant = 1:m_rate
+                    % select random chromosome from source population
+                    %nprev = nrand;
+                    %%while (nprev == nrand) % assert no duplicate selection
+                    nrand = randi(self.gas(idx).Population.size);
+                    % perform migration by replacement
+                    MultiPopulationGA.migrate(self.gas(idx_next).Population, self.gas(idx).Population, nrand);   
+                end
+            end
+        end
+        
+        function migration_neighbour(self, m_rate)
+            % iterate over all populations
+            for idx = 1:self.npop
+                % 1. for each population create migration pool from the
+                % neighbour (forward and backward) populations
+                idx_next = mod(idx, self.npop)+1;
+                idx_prev = mod(idx-2, self.npop)+1;
 
-                    for idx = 1:self.npop
-                        idx_next = mod(idx, self.npop)+1;
-                        %nrand = NaN;
-                        % apply migration rate
-                        for migrant = 1:m_rate
-                            % select random chromosome from source population
-                            %nprev = nrand;
-                            %%while (nprev == nrand) % assert no duplicate selection
-                            nrand = randi(self.gas(idx).Population.size);
-                            % perform migration by replacement
-                            MultiPopulationGA.migrate(self.gas(idx_next).Population, self.gas(idx).Population, nrand);   
-                        end
+                % 2. create migration pool using best chromosomes from
+                % neighbour populations
+                mp = struct('chr', self.gas(idx_prev).Population.get_best_idx(), 'pop', idx_prev);
+                mp(2) = struct('chr', self.gas(idx_next).Population.get_best_idx(), 'pop', idx_next);
 
+                % assure enough chromosomes in migration pool
+                if (m_rate<=length(mp))
+                    % account for migration rate
+                    for m = 1:m_rate
 
+                        % 3. select migrant randomly from migration pool
+                        idx_source = randi(length(mp));
+                        % 4. migrate selected chromosome from pool to current
+                        % population
+                        MultiPopulationGA.migrate(self.gas(idx).Population, self.gas(mp(idx_source).pop).Population, mp(idx_source).chr);
+                        % remove migrated chromosome from migration pool to
+                        % avoid duplicate migrants
+                        mp(idx_source) = []; 
                     end
-                    case 'unrestricted'
-                        % iterate over all populations
-                        for idx = 1:self.npop
-                            % 1. for each population create migration pool from the
-                            % rest populations
-                            mp = struct('chr', [], 'pop', []);
-                            for i = 1:self.npop
-                                if (i ~= idx)
-                                    mp(end+1) = struct('chr', self.gas(i).Population.get_best_idx(), 'pop', i);
-                                end    
-                            end
-                            mp(1) = [];
-                            % account for migration rate
-                            for m = 1:m_rate
-                                % 2. select migrant randomly from migration pool
-                                idx_source = randi(length(mp));
-                                % 3. migrate selected chromosome from pool to current
-                                % population
-                                MultiPopulationGA.migrate(self.gas(idx).Population, self.gas(mp(idx_source).pop).Population, mp(idx_source).chr);
-                                % remove migrated chromosome from migration pool to
-                                % avoid duplicates
-                                mp(idx_source) = []; 
-                            end
-                        end
-                    case 'neighbour'
-                        % iterate over all populations
-                        for idx = 1:self.npop
-                            % 1. for each population create migration pool from the
-                            % neighbour (forward and backward) populations
-                            idx_next = mod(idx, self.npop)+1;
-                            idx_prev = mod(idx-2, self.npop)+1;
-
-                            % 2. create migration pool using best chromosomes from
-                            % neighbour populations
-                            mp = struct('chr', self.gas(idx_prev).Population.get_best_idx(), 'pop', idx_prev);
-                            mp(2) = struct('chr', self.gas(idx_next).Population.get_best_idx(), 'pop', idx_next);
-
-                            % assure enough chromosomes in migration pool
-                            if (m_rate<=length(mp))
-                                % account for migration rate
-                                for m = 1:m_rate
-
-                                    % 3. select migrant randomly from migration pool
-                                    idx_source = randi(length(mp));
-                                    % 4. migrate selected chromosome from pool to current
-                                    % population
-                                    MultiPopulationGA.migrate(self.gas(idx).Population, self.gas(mp(idx_source).pop).Population, mp(idx_source).chr);
-                                    % remove migrated chromosome from migration pool to
-                                    % avoid duplicate migrants
-                                    mp(idx_source) = []; 
-                                end
-                            end
-                        end
-                    otherwise
-                        self.log('Invalid migration policy specified');
                 end
-                self.log('migration done');
             end
-            self.log('evolution done, computing fitnes one last time');
-            for i = 1:length(self.gas)
-                ga = self.gas(i);
-                ga.computeFitness(self.pops(i));
+        end
+        
+        function apply_migration(self, m_policy, m_rate)
+            self.log('starting migration');
+            % Migrate
+            % migration policy
+            switch m_policy
+                case 'ring'
+                    self.log('applying ring migration');
+                    self.migration_ring(m_rate);
+                case 'unrestricted'
+                    self.log('applying unrestricted migration');
+                    self.migration_unrestricted(m_rate);
+                case 'neighbour'
+                    self.log('applying neighbour migration');
+                    self.migration_neighbour(m_rate);
+                otherwise
+                    self.log('Invalid migration policy specified');
             end
-            self.log('done');
+            self.log('migration done');
+        end
+        
+        function evolute(self, e, n_int, m_int)
+            self.log(sprintf('starting a new migration-free interval %d/%d', e, n_int));
+            % Run all GAs for m_int epochs
+            for i=1:self.npop
+                self.log(sprintf('started a new evolution step for population %d/%d', i, self.npop));
+                self.gas(i).runEpochs(self.gas(i).Population, m_int);
+            end
+            self.log('Evolution done');
         end
         
         function log(self, msg)
@@ -173,6 +190,7 @@ classdef MultiPopulationGA < handle
             end
         end
     end
+        
     methods (Static)
          function migrate(p_dest, p_source, idx_source)
             % This function migrates a single selected chromosome 
