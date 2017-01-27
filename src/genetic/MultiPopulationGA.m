@@ -226,6 +226,15 @@ classdef MultiPopulationGA < handle
         
          end
         
+        function policy = get_migration_policy_ring()
+            policy = 'ring';
+        end
+        function policy = get_migration_policy_unrestricted()
+            policy = 'unrestricted';
+        end
+        function policy = get_migration_policy_neighbour()
+            policy = 'neighbour';
+        end
         
         function p = getGAParams()
             % a mutator with
