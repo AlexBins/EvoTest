@@ -9,6 +9,7 @@ classdef Chromosome < handle
         slotlength;
         slotdepth;
         fitness;
+        fitness_values;
     end
     
     methods
@@ -19,6 +20,7 @@ classdef Chromosome < handle
             chr.slotlength = length;
             chr.slotdepth = depth;
             chr.fitness = NaN;
+            chr.fitness_values = [];
         end
         
         function [x, y, angle, length, depth] = get_physical_data(self)

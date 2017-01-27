@@ -47,9 +47,9 @@ classdef MultiPopulationGA < handle
             self.npop = self.npop + 1;
             
             if length(varargin) >= 1
-                fit = params.fit;
-            else
                 fit = varargin{1};
+            else
+                fit = params.fit;
             end
             if length(varargin) >= 2
                 size = varargin{2};
@@ -192,6 +192,16 @@ classdef MultiPopulationGA < handle
     end
         
     methods (Static)
+        function policy = get_migration_policy_ring()
+            policy = 'ring';
+        end
+        function policy = get_migration_policy_unrestricted()
+            policy = 'unrestricted';
+        end
+        function policy = get_migration_policy_neighbour()
+            policy = 'neighbour';
+        end
+        
          function migrate(p_dest, p_source, idx_source)
             % This function migrates a single selected chromosome 
             % from  source population to destination population 

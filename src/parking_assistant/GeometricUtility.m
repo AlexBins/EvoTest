@@ -265,24 +265,28 @@ classdef GeometricUtility
         
         function [coll, dist] = fRectDist(A, B)
             % For efficiency precalculate the B directions beforehand
-            DIRSB = zeros(2, 4);
-            DIRSB(:, 1) = B(:, 1) - B(:, 2);
-            DIRSB(:, 2) = B(:, 2) - B(:, 3);
-            DIRSB(:, 3) = -DIRSB(:, 1);
-            DIRSB(:, 4) = -DIRSB(:, 2);
+            DIRSB = B(:, 1:4) - B(:, 2:5);
+            
+%             DIRSB = zeros(2, 4);
+%             DIRSB(:, 1) = B(:, 1) - B(:, 2);
+%             DIRSB(:, 2) = B(:, 2) - B(:, 3);
+%             DIRSB(:, 3) = -DIRSB(:, 1);
+%             DIRSB(:, 4) = -DIRSB(:, 2);
 
+            DIRSA = A(:, 2:5) - A(:, 1:4);
             for i = 1:4
-                i1 = i + 1;
-                DIRA = A(:, i1) - A(:, i);
+%                 i1 = i + 1;
+                DIRA = DIRSA(:, i);
+                %DIRA = A(:, i1) - A(:, i);
                 for j = 1:4
                     M = [DIRA, DIRSB(:, j)];
                     if det(M) < 10^-5 % parallel lines
                         dotp = dot(B(:, j) - A(:, i), DIRA);
                         if ...
                                 (B(2, j) - A(2, i)) *...
-                                (A(1, i1) - A(1, i)) -...
+                                (DIRA(1)) -...
                                 (B(1, j) - A(1, i)) *...
-                                (A(2, i1) - A(2, i)) == 0 && ...
+                                (DIRA(2)) == 0 && ...
                                 ... This was the 3rd component of the cross product between the extended (B - A) and (A+1, A) vectors.
                                 ... If this component is zero, A, B and A+1 are linear dependent (are on the same line)
                                 dotp > 0 &&... If this dot product is larger than zero, B and A+1 are on the same side of A
@@ -355,6 +359,13 @@ classdef GeometricUtility
         
         function rect = CreateRectangle(x, y, w, h)
             rect = [ x, x+w, x+w, x, x; y, y, y+h, y+h, y; 1, 1, 1, 1, 1];
+        end
+        
+        function dangle = getAngleDistance(angle1, angle2)
+            dangle = mod(angle1 - angle2, 2 * pi);
+            if dangle > pi
+                dangle = 2 * pi - dangle;
+            end
         end
     end
     

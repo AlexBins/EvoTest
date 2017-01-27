@@ -4,6 +4,7 @@ classdef Population < handle
         chromosomes;
         size;
         fitness_log = [];
+        extended_fitness_log = [];
     end
     
     methods
@@ -19,10 +20,12 @@ classdef Population < handle
         function log_fitness(self)
             sum = 0;
             chr_count = length(self.chromosomes);
+            n = size(self.extended_fitness_log, 3) + 1;
             for i = 1:chr_count
                 sum = sum + self.chromosomes(i).fitness;
+                self.extended_fitness_log(:, i, n) = self.chromosomes(i).fitness_values;
             end
-            self.fitness_log(length(self.fitness_log)+1) = sum / chr_count;
+            self.fitness_log(end+1) = sum / chr_count;
         end
         
         function add(self, chromosome)

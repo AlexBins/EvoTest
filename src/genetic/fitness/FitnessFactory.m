@@ -37,13 +37,6 @@ classdef FitnessFactory
                     scenario = varargin{1};
                 end
                 
-                % calculate the slot size multiplier
-                [~, ~, ~, len, dep] = chr.get_physical_data();
-                [min_len, min_dep] = Chromosome.get_min_slot_size();
-                slot_length_multiplier = 1 / (1 + len - min_len);
-                slot_depth_multiplier = 1 / (1 + dep - min_dep);
-                slot_size_multiplier = 2 * slot_depth_multiplier * slot_length_multiplier;
-                
                 if isempty(scenario.MinDistanceTime)
                     fitness_value = 0;
                     return;
@@ -63,7 +56,7 @@ classdef FitnessFactory
                 % if distance < 0.5: still ok. No penalty
                 % if distance > 0.5: that's bad. Probably out of PP
                 % scope => penalty
-                max_distance_multiplier = 2;
+                max_distance_multiplier = 1;
                 collision_distance_multiplier = max_distance_multiplier / (1 + distance);
                 
                 acceptable_min_distance = 0.15;
@@ -71,7 +64,7 @@ classdef FitnessFactory
                 temporary_helper = min_distance * (-5) / acceptable_min_distance + 5;
                 min_distance_multiplier = max_distance_multiplier * (1 / (1 + exp(-temporary_helper)));
                 
-                fitness_value = min_distance_multiplier * collision_distance_multiplier * slot_size_multiplier;
+                fitness_value = min_distance_multiplier * collision_distance_multiplier;
             end
             fitness_func = @fitness;
         end
@@ -87,28 +80,34 @@ classdef FitnessFactory
             fitness_func = @fitness;
         end
         
-        function fitness_func = get_car_orientation_punishing(min_angle, max_angle, punishing_factor)
-            % Returns a fitness function punishing chromosomes' fitness by
-            % the car's initial orientation (min_angle and max_angle
-            % between 0 and 2 * pi and punishing_factor is the fitness
-            % value multiplied with, if the actual angle is outside of
-            % this range)
+        function fitness_func = get_car_orientation_punishing(min_angle, max_angle, ~)
+            % Uses a Guassian Bell to calculate the fitness
             
             min_angle = mod(min_angle, 2 * pi);
             max_angle = mod(max_angle, 2 * pi);
             
-            function value = punish(angle)
-                angle = mod(angle, 2 * pi);
-                if min_angle > angle || max_angle < angle
-                    value = punishing_factor;
-                else
-                    value = 1;
-                end
-            end
-            fitness_func = FitnessFactory.get_car_orientation_evaluating(@punish);
+            sigma = GeometricUtility.getAngleDistance(min_angle, max_angle) / 2;
+            ny = mod(min_angle + sigma, 2 * pi);
+            sigma = sigma / 1.25;
+            
+            x = @(orientation) GeometricUtility.getAngleDistance(orientation, ny);
+            f = @(x) exp(-x^2 / (sigma ^ 2 * 2^4));
+            func = @(orientation) f(x(orientation));
+            
+            fitness_func = FitnessFactory.get_car_orientation_evaluating(func);
         end
         
-        function fitness_func = get_car_location_punishing(line_start_point, line_direction, expecting_left_of_line, punishing_factor)
+        function fitness_func = get_car_location_punishing(x_expected, y_expected, x_max_distance, y_max_distance)
+            % Returns a fitness function evaluating the location by using a
+            % two dimensional normal distribution where x_expected is x0
+            % and y_expected is y0. max_distances are the respective sigmas
+            
+            f = @(x, y) exp(-((x-x_expected)^2 / (2 * x_max_distance ^ 2) + (y - y_expected)^2 / (2 * y_max_distance ^2)));
+            func = @(loc) f(loc(1), loc(2));
+            fitness_func = FitnessFactory.get_car_location_evaluating(func);
+        end
+        
+        function fitness_func = get_car_location_punishing_deprecated(line_start_point, line_direction, expecting_left_of_line, punishing_factor)
             % Returns a fitness function punishing chromosomes' fitness by
             % the car's initial location (if the location is on the wrong
             % side of the lane, the punishing factor is applied)
@@ -181,7 +180,9 @@ classdef FitnessFactory
                 %scenario.RunParkingPilot();
                 for i = 1:length(varargin)
                     f = varargin{i};
-                    fitness = fitness * f(chr, scenario);
+                    fv = f(chr, scenario);
+                    chr.fitness_values(i) = fv;
+                    fitness = fitness * fv;
                 end
             end
             fitness_func = @fit;
@@ -202,8 +203,7 @@ classdef FitnessFactory
         function fitnes_func = get_min_parking_slot()
             function fitness = fit(chr, varargin)
                 [~, ~, ~, l, d] = chr.get_physical_data();
-                fitness = 1 / (l + d);
-                fitness = fitness ^ 2;
+                fitness = sum(Chromosome.get_min_slot_size()) / (l + d);
             end
             fitnes_func = @fit;
         end
