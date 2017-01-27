@@ -104,23 +104,29 @@ classdef MultiPopulationGA < handle
                     mp(idx_source) = []; 
                 end
             end
+            % perform replacement of worst chromosomes by migrants
+            self.reduceAllPops();
         end
         
         function migration_ring(self, m_rate)
             % migrate to the next neighbor clockwise
             for idx = 1:self.npop
                 idx_next = mod(idx, self.npop)+1;
-                %nrand = NaN;
+                nrand = -1;
                 % apply migration rate
                 for migrant = 1:m_rate
                     % select random chromosome from source population
-                    %nprev = nrand;
-                    %%while (nprev == nrand) % assert no duplicate selection
+                    nprev = nrand;
+                    % ensure no duplicates and no circular migrants
+                    while (nprev == nrand) || isnan(self.gas(idx).Population.chromosomes(nrand).fitness)   % assert no duplicate selection
                     nrand = randi(self.gas(idx).Population.size);
+                    end
                     % perform migration by replacement
                     MultiPopulationGA.migrate(self.gas(idx_next).Population, self.gas(idx).Population, nrand);   
                 end
             end
+            % perform replacement of worst chromosomes by migrants
+            self.reduceAllPops();
         end
         
         function migration_neighbour(self, m_rate)
@@ -152,6 +158,8 @@ classdef MultiPopulationGA < handle
                     end
                 end
             end
+            % perform replacement of worst chromosomes by migrants
+            self.reduceAllPops();
         end
         
         function apply_migration(self, m_policy, m_rate)
@@ -189,19 +197,14 @@ classdef MultiPopulationGA < handle
                 fprintf('%s|MPA|%s\n', datetime('now'), msg);
             end
         end
+         function reduceAllPops(self)
+             for i = 1:self.npop
+                 self.pops(i).reduce();
+             end
+         end
     end
         
     methods (Static)
-        function policy = get_migration_policy_ring()
-            policy = 'ring';
-        end
-        function policy = get_migration_policy_unrestricted()
-            policy = 'unrestricted';
-        end
-        function policy = get_migration_policy_neighbour()
-            policy = 'neighbour';
-        end
-        
          function migrate(p_dest, p_source, idx_source)
             % This function migrates a single selected chromosome 
             % from  source population to destination population 
@@ -213,14 +216,16 @@ classdef MultiPopulationGA < handle
             chr = Chromosome.copy(p_source.chromosomes(idx_source));
             
             % Remove worst chromosome from the destination population
-            p_dest.size = p_dest.size - 1;    
-            p_dest.reduce();
+            %p_dest.size = p_dest.size - 1;    
+            %p_dest.reduce();
             % Insert selected chromosome to destination population
-            p_dest.insert(chr);
+            %p_dest.insert(chr);
+            p_dest.add(chr);
             % Remove chromosome from the source population
             %p_source.remove(idx_source);
         
-        end
+         end
+        
         
         function p = getGAParams()
             % a mutator with
