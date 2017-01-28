@@ -92,6 +92,12 @@ classdef GenericGA < handle
             end
             population.log_fitness();
         end
+        
+        function computeSingleFitness(self, chromosome)
+            % Computes the fitness of a single chromosome
+            self.log('Compute fitness for a single chromosome');
+            chromosome.fitness = self.FitnessFunction(chromosome);
+        end
     end
     
 end

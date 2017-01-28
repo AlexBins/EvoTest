@@ -81,6 +81,8 @@ classdef MultiPopulationGA < handle
         end
         
         function migration_unrestricted(self, m_rate)
+            % DEPRECATED
+            
             % iterate over all populations
             for idx = 1:self.npop
                 % 1. for each population create migration pool from the
@@ -107,6 +109,8 @@ classdef MultiPopulationGA < handle
         end
         
         function migration_ring(self, m_rate)
+            % DEPRECATED
+            
             % migrate to the next neighbor clockwise
             for idx = 1:self.npop
                 idx_next = mod(idx, self.npop)+1;
@@ -124,6 +128,8 @@ classdef MultiPopulationGA < handle
         end
         
         function migration_neighbour(self, m_rate)
+            % DEPRECATED
+            
             % iterate over all populations
             for idx = 1:self.npop
                 % 1. for each population create migration pool from the
@@ -154,23 +160,95 @@ classdef MultiPopulationGA < handle
             end
         end
         
+        function pools = build_migration_pools(self, m_rate)
+            self.log('Staring to build migration pools');
+            % preallocate memory for performance
+            pools = cell(1, self.npop);
+            % iterate over all populations
+            for i_pop = 1:self.npop
+                % get the sorted fitness value indexes
+                pop = self.pops(i_pop);
+                fitness_values = [pop.chromosomes.fitness];
+                [~, fitness_indexes] = sort(fitness_values, 'descend');
+                % truncate the last indexes
+                fitness_indexes = fitness_indexes(1:m_rate);
+                % add the chromosomes to the pool
+                pools{i_pop} = self.pops(i_pop).chromosomes(fitness_indexes);
+            end
+            self.log('Building migration pools finished');
+        end
+        
+        function getter_func = policy_migrant_getter(self, m_policy)
+            % Use methods returned by this function:
+            % [migrant, pool] = getter_func(i_current_population,
+            % n_previous_migrations, pool);
+            
+            self.log('Creating migrant getter functions');
+            switch m_policy
+                case 'ring'
+                    self.log('Ring migration getter');
+                    getter_func = @MultiPopulationGA.migrant_getter_ring;
+                case 'unrestricted'
+                    self.log('Unrestricted migration getter');
+                    getter_func = @MultiPopulationGA.migrant_getter_unrestricted;
+                case 'neighbour'
+                    self.log('Neighbour migration getter ');
+                    getter_func = @MultiPopulationGA.migrant_getter_neighbour;
+                otherwise
+                    self.log('Invalid migration policy specified');
+            end
+            
+            getter_func = MultiPopulationGA.migrant_getter_wrapper(getter_func);
+            self.log('Migration getter function created');
+        end
+        
         function apply_migration(self, m_policy, m_rate)
             self.log('starting migration');
             % Migrate
             % migration policy
-            switch m_policy
-                case 'ring'
-                    self.log('applying ring migration');
-                    self.migration_ring(m_rate);
-                case 'unrestricted'
-                    self.log('applying unrestricted migration');
-                    self.migration_unrestricted(m_rate);
-                case 'neighbour'
-                    self.log('applying neighbour migration');
-                    self.migration_neighbour(m_rate);
-                otherwise
-                    self.log('Invalid migration policy specified');
+            
+            % TODO: IMPORTANT!!!
+            % Build pools. one per population. m_rate chromosomes per pool.
+            % get the migrant_getter function. depends on policy.
+            % ring: input i_current_population. get and remove the migrant
+            % from the last population's pool.
+            % unrestricted: input i_current_population: get and remove the
+            % migrant from any pool, but the own one.
+            % neighbour: input i_current_population, left or right neighbour.
+            % get and remove the migrant from one neighbouring population's
+            % pool.
+            
+            migration_pools = self.build_migration_pools(m_rate);
+            migrant_getter = self.policy_migrant_getter(m_policy);
+
+            for i_population = 1:self.npop
+                self.log('Reducing population size');
+                pop = self.pops(i_population);
+                pop.size = pop.size - m_rate;
+                pop.reduce();
+                
+                self.log(['Migrating into population:', num2str(i_population)]);
+                for i_migration_step = 1:m_rate
+                    [migrant, migration_pools] = migrant_getter(i_population, i_migration_step - 1, migration_pools);
+                    self.pops(i_population).insert(migrant);
+                    self.gas(i_population).computeSingleFitness(migrant);
+                end
             end
+            
+%            % Old way
+%             switch m_policy
+%                 case 'ring'
+%                     self.log('applying ring migration');
+%                     self.migration_ring(m_rate);
+%                 case 'unrestricted'
+%                     self.log('applying unrestricted migration');
+%                     self.migration_unrestricted(m_rate);
+%                 case 'neighbour'
+%                     self.log('applying neighbour migration');
+%                     self.migration_neighbour(m_rate);
+%                 otherwise
+%                     self.log('Invalid migration policy specified');
+%             end
             self.log('migration done');
         end
         
@@ -192,6 +270,89 @@ classdef MultiPopulationGA < handle
     end
         
     methods (Static)
+        function migrant_getter = migrant_getter_wrapper(getter_function)
+            % wrapper to copy the migrant
+            function [migrant, migration_pools] = getter(i_target_population, n_previous_migrations, migration_pools)
+                [migrant, migration_pools] = getter_function(i_target_population, n_previous_migrations, migration_pools);
+                migrant = Chromosome.copy(migrant);
+            end
+            migrant_getter = @getter;
+        end
+        
+        function [migrant, migration_pools] = migrant_getter_neighbour(i_target_population, n_previous_migrations, migration_pools)
+            % get the circular next and previous pool's index
+            n_pools = length(migration_pools);
+            i_prev_pop = mod(i_target_population - 2, n_pools) + 1;
+            i_next_pop = mod(i_target_population, n_pools) + 1;
+            
+            % select the pool to choose from, depending on the previous
+            % migration steps
+            if mod(n_previous_migrations, 2) == 0
+                i_source = i_next_pop;
+            else
+                i_source = i_prev_pop;
+            end
+            
+            % Get the migrant and remove it from the pool
+            i_mig = randi(length(migration_pools{i_source}));
+            migrant = migration_pools{i_source}(i_mig);
+            migration_pools{i_source}(i_mig) = [];
+        end
+        
+        function [migrant, migration_pools] = migrant_getter_ring(i_target_population, ~, migration_pools)
+            % Get the circular previous population
+            i_pop = mod(i_target_population - 2, length(migration_pools)) + 1;
+            % Get the random migrant's index from the population's pool
+            i_mig = randi(length(migration_pools{i_pop}));
+            % Get the migrant itself
+            migrant = migration_pools{i_pop}(i_mig);
+            % Delete the migrant from the pool
+            migration_pools{i_pop}(i_mig) = [];
+        end
+        
+        function [migrant, migration_pools] = migrant_getter_unrestricted(i_target_population, ~, migration_pools)
+            % Exclude empty pools from the random pools selection
+            
+            % this holds the number of not empty pools in the end
+            n_pools = length(migration_pools);
+            % this holds the number of empty pools in the end
+            n_empty_pools = 0;
+            % this maps from the index of the 'not empty pool' list to the
+            % actuall pools (e.g.: pool 2 and 4 are empty. 5 pools in
+            % total: i_indexes = [1, 3, 5, ~, ~]. ~ because these are not
+            % important anyways)
+            i_indexes = 1:n_pools;
+            
+            for i = 1:n_pools
+                % Using the comparison to i_target_population implicitly
+                % gets rid of the self to self migration issue
+                if isempty(migration_pools{i}) || i_target_population == i
+                    n_empty_pools = n_empty_pools + 1;
+                    i_indexes(i_indexes >= i) = i_indexes(i_indexes >= i) + 1;
+                end
+            end
+            
+            % Well if this happens... fuck... then we previously had bad
+            % luck and now we are in the last population where we realise
+            % all the other pools are empty, only ours is left. Then we
+            % have to migrant from self to self. Not good, but otherwise
+            % mpga will crash
+            if n_empty_pools == n_pools
+                i_pop = i_target_population;
+            else
+                % Get the index of non empty pools
+                i_pop = randi(n_pools - n_empty_pools);
+                % Map the index
+                i_pop = i_indexes(i_pop);
+            end
+            % Get the migrant's index
+            i_mig = randi(length(migration_pools{i_pop}));
+            % Get the migrant itself
+            migrant = migration_pools{i_pop}(i_mig);
+            % Remove the migrant
+            migration_pools{i_pop}(i_mig) = [];
+        end
+        
         function policy = get_migration_policy_ring()
             policy = 'ring';
         end
@@ -203,6 +364,8 @@ classdef MultiPopulationGA < handle
         end
         
          function migrate(p_dest, p_source, idx_source)
+            % DEPRECATED
+            
             % This function migrates a single selected chromosome 
             % from  source population to destination population 
             % The migrated chromosome replaces the chromosome with the worst
