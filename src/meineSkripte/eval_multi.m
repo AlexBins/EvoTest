@@ -3,7 +3,7 @@ function eval_multi(ga_instanz)
     colors = ['r'; 'b'; 'g'; 'y'; 'c'; 'k'; 'm'];
     
     figure(1);
-    axis([-7.5 7.5 -1 5]);
+    axis([-4 4 -2 5]);
     hold on;
     for i = 1:length(pops)
         fprintf('\n\nPloting a new Population\n');

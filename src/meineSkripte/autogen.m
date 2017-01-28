@@ -21,6 +21,6 @@ function execute_mpga(pop_size, migration_rate, cycle_size, cycle_count, policy)
     eval_multi(mpga);
     filename = sprintf('policy-%s_migRate-%d_cycleSize-%d', policy, migration_rate, cycle_size);
     save(sprintf('%s.mat', filename), 'mpga');
-    saveas(1, sprintf('%s-tcs.jpg', filename));
-    saveas(2, sprintf('%s-fit.jpg', filename));
+    saveas(1, sprintf('%s-tcs.svg', filename));
+    saveas(2, sprintf('%s-fit.svg', filename));
 end
