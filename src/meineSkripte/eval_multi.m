@@ -3,6 +3,7 @@ function eval_multi(ga_instanz)
     colors = ['r'; 'b'; 'g'; 'y'; 'c'; 'k'; 'm'];
     
     figure(1);
+    axis([-7.5 7.5 -1 5]);
     hold on;
     for i = 1:length(pops)
         fprintf('\n\nPloting a new Population\n');
@@ -16,6 +17,7 @@ function eval_multi(ga_instanz)
     ylabel('y-Position');
     
     figure(2);
+    axis([0 inf 0 1]);
     hold on;
     for i = 1:length(pops)
         plot(pops(i).fitness_log);
