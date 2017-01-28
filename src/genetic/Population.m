@@ -55,12 +55,12 @@ classdef Population < handle
         end
         
         function best_idx = get_best_idx(self)
-            % Returns index of the chromosome with best(lowest) fitness value
+            % Returns index of the chromosome with best(highest) fitness value
                 current_best_idx = 1;
-                current_best_fitness = 1;
+                current_best_fitness = 0;
                 for j = 1:length(self.chromosomes)
                     current_fitness = self.chromosomes(j).fitness;
-                    if (current_fitness < current_best_fitness)
+                    if (current_fitness > current_best_fitness)
                         current_best_idx = j;
                         current_best_fitness = current_fitness;
                     end
