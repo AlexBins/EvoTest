@@ -15,6 +15,8 @@ classdef MultiPopulationGA < handle
         ga_params % struct of parameters for genericGA
         
         verbose = false;
+        
+        neighbour_relation = [];
     end
     
     methods
@@ -36,7 +38,7 @@ classdef MultiPopulationGA < handle
             end
         end
         
-        function pop = addPopulation(self, varargin)
+        function [pop, idx_pop] = addPopulation(self, varargin)
             % Adds a new population
             % 
             % arg1: fitness function. (optional)
@@ -61,8 +63,9 @@ classdef MultiPopulationGA < handle
             ga = GenericGA(params.rr, fit, params.select, params.merger, params.rational);
             ga.Population = pop;
             
-            self.gas(self.npop) = ga;
-            self.pops(self.npop) = pop;
+            idx_pop = self.npop;
+            self.gas(idx_pop) = ga;
+            self.pops(idx_pop) = pop;
         end
         
         function runMPGA(self, m_rate, m_int, n_int, m_policy)
@@ -189,7 +192,7 @@ classdef MultiPopulationGA < handle
         function getter_func = policy_migrant_getter(self, m_policy)
             % Use methods returned by this function:
             % [migrant, pool] = getter_func(i_current_population,
-            % n_previous_migrations, pool);
+            % mpga.neighbour_relation, pool);
             
             self.log('Creating migrant getter functions');
             switch m_policy
@@ -237,7 +240,7 @@ classdef MultiPopulationGA < handle
                 
                 self.log(['Migrating into population:', num2str(i_population)]);
                 for i_migration_step = 1:m_rate
-                    [migrant, migration_pools] = migrant_getter(i_population, i_migration_step - 1, migration_pools);
+                    [migrant, migration_pools] = migrant_getter(i_population, self.neighbour_relation, migration_pools);
                     self.pops(i_population).insert(migrant);
                     self.gas(i_population).computeSingleFitness(migrant);
                 end
@@ -292,24 +295,30 @@ classdef MultiPopulationGA < handle
             migrant_getter = @getter;
         end
         
-        function [migrant, migration_pools] = migrant_getter_neighbour(i_target_population, n_previous_migrations, migration_pools)
-            % get the circular next and previous pool's index
-            n_pools = length(migration_pools);
-            i_prev_pop = mod(i_target_population - 2, n_pools) + 1;
-            i_next_pop = mod(i_target_population, n_pools) + 1;
+        function [migrant, migration_pools] = migrant_getter_neighbour(i_target_population, neighbour_relation, migration_pools)
+            % Get all neighbours
+            i_neighbours = neighbour_relation.getNeighbours(i_target_population);
+            % Remove neighbours withoud elements in the pool left
+            for i = length(i_neighbours):-1:1
+                curr_neighbour = i_neighbours(i);
+                if isempty(migration_pools{curr_neighbour})
+                    i_neighbours(i) = [];
+                end
+            end
             
-            % select the pool to choose from, depending on the previous
-            % migration steps
-            if mod(n_previous_migrations, 2) == 0
-                i_source = i_next_pop;
+            % select the pool to choose from
+            if isempty(i_neighbours)
+                % If this happens, we had bad luck previously and all
+                % neighbours traded migrants so it's only us left
+                i_neighbour = i_target_population;
             else
-                i_source = i_prev_pop;
+                i_neighbour = datasample(i_neighbours, 1);
             end
             
             % Get the migrant and remove it from the pool
-            i_mig = randi(length(migration_pools{i_source}));
-            migrant = migration_pools{i_source}(i_mig);
-            migration_pools{i_source}(i_mig) = [];
+            i_mig = randi(length(migration_pools{i_neighbour}));
+            migrant = migration_pools{i_neighbour}(i_mig);
+            migration_pools{i_neighbour}(i_mig) = [];
         end
         
         function [migrant, migration_pools] = migrant_getter_ring(i_target_population, ~, migration_pools)

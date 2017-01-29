@@ -89,15 +89,19 @@ function [ mpga ] = evolute_multipop(pop_size, migration_rate, migration_interva
         %fit_distance);
 
     mpga = MultiPopulationGA(pop_size);
-    poplb = mpga.addPopulation(tc_left_bottom);
-    popll = mpga.addPopulation(tc_left_left);
-    poplr = mpga.addPopulation(tc_left_right);
-    poplt = mpga.addPopulation(tc_left_top);
-    poprb = mpga.addPopulation(tc_right_bottom);
-    poprl = mpga.addPopulation(tc_right_left);
-    poprr = mpga.addPopulation(tc_right_right);
-    poprt = mpga.addPopulation(tc_right_top);
+    [~, idx_lb] = mpga.addPopulation(tc_left_bottom);
+    [~, idx_ll] = mpga.addPopulation(tc_left_left);
+    [~, idx_lr] = mpga.addPopulation(tc_left_right);
+    [~, idx_lt] = mpga.addPopulation(tc_left_top);
+    [~, idx_rb] = mpga.addPopulation(tc_right_bottom);
+    [~, idx_rl] = mpga.addPopulation(tc_right_left);
+    [~, idx_rr] = mpga.addPopulation(tc_right_right);
+    [~, idx_rt] = mpga.addPopulation(tc_right_top);
     mpga.enable_logging(true);
+    
+    mpga.neighbour_relation = NeighbourhoodDescription(8);
+    mpga.neighbour_relation.addNeighbourClass([idx_lb, idx_ll, idx_lr, idx_lt]);
+    mpga.neighbour_relation.addNeighbourClass([idx_rb, idx_rl, idx_rr, idx_rt]);
 
     mpga.runMPGA(migration_rate, migration_interval , migration_cycles, migration_policy);
 end
