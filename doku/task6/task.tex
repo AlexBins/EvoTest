@@ -1,0 +1,28 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\author{Alexander Binsmaier, Manuel Mende, Yaroslav Direy}
+\title{Auswertung MPGA -- günstige und ungünstige Parametrisierungen}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\section{Allgemeines Vorgehen}
+Um die Parametrisierung der Algorithmen gegeneinander auszuwerten, muss eine Vergleichsbasis geschaffen werden. Eine Möglichkeit ist es, den genetischen Multi-Populations-Algorithmus ohne Migration laufen zu lassen. Basierend auf den Ergebnissen dieses Durchlaufs können dann unterschiedliche Konfigurationen des Algorithmus ausgeführt und verglichen werden. Um die Komplexität zu relativieren, wurden einige Einschränkungen getroffen. Die Algorithmen sollen immer auf acht Chromosome umfassende Populationen angewendet werden. Die Parametrisierung des zugrunde liegenden genetischen Algorithmus ist identisch -- abgesehen von den verwendeten Fitnessfunktionen -- und die durchlaufenden Generationen werden auch konstant gehalten. Eine geeignete Anzahl Generationen wird durch die migrationslose Ausführung festgelegt. Als Variationsparameter verbleiben die Anzahl an Migrationen und die Anzahl an Generationen bis zur nächsten Migration. Zudem kann die Strategie variiert werden.
+
+ Die Auswertung erfolgt im Anschluss und betrachtet vor allem die Entwicklung der mittleren Populationsfitness über die Epochen. Speziell gilt das Interesse, wie schnell ein akzeptables Fitness-Niveau erreicht wird. Auch die Testfälle der Ergebnispopulation werden entsprechend in die Bewertung mit eingehen.
+
+\section{Verfügbare Strategien}
+Es stehen verschiedene Strategien zur Migration zur Verfügung. Primär existiert die uneingeschränkte Migration (unrestricted), bei der jede Population in jede andere Population migrieren kann. Als zweite Möglichkeit besteht die Ring-Migration. Hier wird semantisch nicht zusammenhängend in die nächste Population migriert. Die auf Nachbarschaft basierende Migrationsstrategie erlaubt eine Migration nur, wenn Ziel- und Quellpopulation auf der selben Seite -- also vor oder hinter -- der Parklücke liegen. 
+
+\section{Migrationsfreier Durchlauf}
+\section{Schlechte Konfigurationen}
+\section{Gute Konfigurationen}
+
+\end{document}
