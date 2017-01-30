@@ -57,6 +57,31 @@ Ein Austausch von 50\% der Population führt schon zu einer Steigerung der Gesam
 Im Vergleich zu anderen Parametrisierungen ist diese allerdings gering und im Besonderen schlechter als migrationsfreie Evolution, was Abbildung \ref{fig:mid_migrate} entnommen werden kann. In Ausnahmefällen kann es dennoch zu einer sprunghaften Steigerung führen, allerdings ist dieses Verhalten stark vom Zufall behaftet.
 
 \section{Gute Konfigurationen}
-Häufige Migration weniger Chromosome liefert gute Ergebnisse.
+% Generell ist eine migRate von 1 gut. Häufige Migration sorgt für schnelle Konvergenz (cs=1). Seltene Migration (cs=100) sorgt für homogene Ergebnispopulationen, die Konvergenz ist nicht ganz so schnell. Dennoch ist die Geschwindigkeit in Relation zum plain-Ansatz besser.
+Eine gering gewählte Anzahl Migrationsvorgänge in jedem Migrationszyklus führt zu stärkerer Fitness-Konvergenz.
+\begin{figure}
+\centering
+\subfigure[Kleine Migrationszyklen\label{fig:small_cycles}]{
+	\includegraphics[width=.45\textwidth]{policy-ring_migRate-1_cycleSize-1-fit.jpg}
+}
+\subfigure[Große Migrationszyklen\label{fig:big_cycles}]{
+	\includegraphics[width=.45\textwidth]{policy-ring_migRate-1_cycleSize-250-fit.jpg}
+}
+\caption{Fitness unterschiedlicher Migrationszyklus-Längen}
+\end{figure}
+Abbildung \ref{fig:small_cycles} zeigt kleine Migrationszyklen der Größe eins. Es wird also nach jedem Evolutionsschritt migriert. Man erkennt eine sich schnell verbessernde Gesamtfitness. Bei 250 Generationen vor der nächsten Migration in Abbildung \ref{fig:big_cycles} ist auch ein Aufwärtstrend erkennbar, allerdings nur wenig schneller als bei der isolierten Evolution aus Abbildung \ref{fig:plain_fit}.
+\begin{figure}
+\centering
+\subfigure[Kleine Migrationszyklen\label{fig:small_cycles_tcs}]{
+	\includegraphics[width=.45\textwidth]{policy-ring_migRate-1_cycleSize-1-tcs.jpg}
+}
+\subfigure[Große Migrationszyklen\label{fig:big_cycles_tcs}]{
+	\includegraphics[width=.45\textwidth]{policy-ring_migRate-1_cycleSize-250-tcs.jpg}
+}
+\caption{Ergebnispopulation verschiedener Migrationszyklus-Längen}
+\end{figure}
+Vergleicht man hingegen die Ergebnispopulationen, erkennt man eine stärkere Homogenität der Testfälle bei größeren Migrationszyklen. Dies ist zu erwarten, da der genetische Algorithmus bei kleinen Migrationszyklen nicht die Chance bekommt, neu migrierte Individuen in seine Population aufzunehmen beziehungsweise auszugrenzen. Die hellblaue Population in \ref{fig:big_cycles_tcs} schwankt stark, selbiges gilt für die rote und die magenta-farbige Population. Bei den Testfällen in Abbildung \ref{fig:small_cycles_tcs} hingegen weist lediglich die gelbe Population stark unterschiedliche Individuen auf. Betrachtet man die resultierenden Testfälle genauer, passen sie genau in das spezifizierte Testfall-Schema. Jede Population lässt sich einer Testfallklasse zuordnen.
 
+\section{Zusammenfassung}
+Allgemein kann also durch eine Abwägung von Konvergenz-Geschwindigkeit und Heterogenität der Testfälle eine geeignete Migrationszyklus-Größe gewählt werden.
 \end{document}
