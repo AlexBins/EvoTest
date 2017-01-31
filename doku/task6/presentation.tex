@@ -76,6 +76,14 @@ Auswertung:
 }
 
 \frame{
+\frametitle{Migrationsfreier Durchlauf}
+\begin{figure}
+\includegraphics[width=.45\textwidth]{mig_free_fit.jpg}
+\caption{Migrationsfreie Evolution mit 1000 Generationen}
+\end{figure}
+}
+
+\frame{
 \frametitle{Ergebnis: Schlechte Konfigurationen}
 Hohe Migrationsraten werfen die Populationen weit zurück.\\
 \begin{figure}
@@ -136,18 +144,19 @@ Im Vergleich:
 \frame{
 \frametitle{Ergebnis: Zusammenfassung}
 \begin{enumerate}
-	\item Im Allgemeinen
+	\item 
+	Mittlere bis Kleine Migrationszyklen bei kleiner Migrationsrate führt zu den besten Durchläufen.
 	\begin{itemize}
 		\item Kleine Migrationsraten $>$ Große Migrationsraten
 		\item Kleine Migrationszyklen sind schneller als große
 		\item Große Migrationszyklen sind 'besser' als kleine
 	\end{itemize}
-	Wähle die dem Problem angemessene Zyklus-Größe.
-	\item Kein auffälliger Unterschied zwischen MPGA Ergebnissen, Laufzeit und Konvergenzverhalten bei passender Konfiguration im Vergleich zum Single Population Genetic Algorithm
+	\item Multi Population GA im Allgemeinen besser als Single Population GA
+	\begin{itemize}
+		\item Ergebnisse der MPGA Populationen sind sich populationsübergreifend ähnlicher als bei normalen GA
+		\item Konvergenz von MPGAs erfolgt schneller als bei normalen GA
+	\end{itemize}
 \end{enumerate}
-}
-
-\frame{
 }
 
 \end{document}
